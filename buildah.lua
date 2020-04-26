@@ -89,7 +89,7 @@ local from = function(base, assets, name)
     --++ Writes to the root('/') directory if *destination* is not given.
     --++
     env.COPY = function(src, dest)
-        dest = dest or '/'
+        dest = dest or '/'..src
         msg.debug("COPY '%s' to '%s'", src, dest)
         popen("buildah copy %s %s/%s %s", name, assets, src, dest)
     end
