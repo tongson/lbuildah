@@ -151,23 +151,6 @@ local from = function(base, cwd, name)
         popen("buildah config --cmd '' %s", name)
         popen("buildah config --stop-signal TERM %s", name)
     end
-    --++ ### DROPBEAR(port)
-    --++ Sets the container entrypoint to `dropbear`.
-    --++ The argument *port* is the localhost(127.0.0.1) port number `dropbear` listens to.
-    --++
-    env.DROPBEAR = function(p, old)
-        p = tostring(p)
-        msg.debug("DROPBEAR localhost:%s", p)
-        local s
-        if old then
-            s = F('["/usr/sbin/dropbear", "-b", "/etc/banner", "-FEm", "-p", "127.0.0.1:%s"]', p)
-        else
-            s = F('["/usr/sbin/dropbear", "-R", "-F", "-E", "-B", "-j", "-k", "-p", "127.0.0.1:%s", "-b", "/etc/banner"]', p)
-        end
-        popen("buildah config --entrypoint '%s' %s", s, name)
-        popen("buildah config --cmd '' %s", name)
-        popen("buildah config --stop-signal TERM %s", name)
-    end
     --++ ### WRITE(directory)
     --++ Writes the container image to *directory*.
     --++ > NOTE: This finalizes the `buildah` run.
