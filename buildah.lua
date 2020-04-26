@@ -97,12 +97,15 @@ local from = function(base, cwd, name)
         msg.debug("COPY '%s' to '%s'", src, dest)
         popen("buildah copy %s %s %s", name, src, dest)
     end
-    --++ ### MKDIR(directory)
+    --++ ### MKDIR(directory, [mode])
     --++ Create directory within container.
     --++
-    env.MKDIR = function(d)
+    --++ Optional directory mode in octal.
+    --++
+    env.MKDIR = function(d, m)
+        m = m or ""
         msg.debug("MKDIR %s", d)
-        popen("buildah run %s -- %s/mkdir %s", name, util_buildah, d)
+        popen("buildah run %s -- %s/mkdir %s %s", name, util_buildah, d, m)
     end
     --++ ### RM(file)
     --++ Deletes the string *file*.
