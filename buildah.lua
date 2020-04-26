@@ -23,7 +23,7 @@ local from = function(base, cwd, name)
     if not (cwd ==  ".") then
        dir = "../buildah.d/"
     end
-    local utils = "/____util-buildah/"
+    local util_buildah = "/____util-buildah/"
 
     local popen = exec.ctx()
     popen.cwd = cwd
@@ -38,7 +38,7 @@ local from = function(base, cwd, name)
         msg.ok(F("Reusing %s.", name))
     end
 
-    popen("buildah add %s '%s/util-buildah.tar.xz' '%s'", name, dir, utils)
+    popen("buildah add %s '%s/util-buildah.tar.xz' '%s'", name, dir, util_buildah)
     msg.debug"Copied util-buildah."
 
     local mount do
@@ -46,9 +46,9 @@ local from = function(base, cwd, name)
         mount = res.output[1]
     end
 
-    local rmutils = function()
-	popen("test -d %s/%s", mount, utils)
-	popen("rm -rf %s/%s", mount, utils)
+    local rm_util_buildah = function()
+	popen("test -d %s/%s", mount, util_buildah)
+	popen("rm -rf %s/%s", mount, util_buildah)
     end
 
     local env = {}
@@ -69,7 +69,7 @@ local from = function(base, cwd, name)
         msg.debug("SCRIPT %s", a)
         popen("buildah copy %s %s /%s", name, a, a)
         popen("buildah run %s -- sh /%s", name, a)
-        popen("buildah run %s -- rm -f /%s", name, a)
+        popen("buildah run %s -- %s/rm /%s", name, util_buildah, a)
     end
     --++ ### APT_GET(arguments)
     --++ Wraps the /Debian/ `apt-get` command.
@@ -189,7 +189,7 @@ local from = function(base, cwd, name)
     --++
     env.WRITE = function(cname)
         msg.debug("WRITE containers-storage:%s", cname)
-        rmutils()
+        rm_util_buildah()
         local tmpname = F("%s.%s", cname, util.random_string(16))
         popen("buildah commit --rm --squash %s dir:%s", name, tmpname)
         popen([[mv $(find %s -maxdepth 1 -type f -exec file {} \+ | awk -F\: '/archive/{print $1}') %s.tar]], tmpname, tmpname)
@@ -205,7 +205,7 @@ local from = function(base, cwd, name)
     --++
     env.ARCHIVE = function(cname)
         msg.debug("ARCHIVE oci:%s", cname)
-        rmutils()
+        rm_util_buildah()
         popen("buildah commit --rm --squash %s oci-archive:%s", name, cname)
         msg.ok("OCI image %s", cname)
     end
@@ -217,7 +217,7 @@ local from = function(base, cwd, name)
     env.CONTAINERS_STORAGE = function(cname, tag)
         tag = tag or "latest"
         msg.debug("CONTAINERS-STORAGE %s:%s", cname, tag)
-        rmutils()
+        rm_util_buildah()
         popen("buildah commit --rm --squash %s containers-storage:%s:%s", name, cname, tag)
         msg.ok("Committed image %s", cname)
     end
@@ -231,7 +231,7 @@ local from = function(base, cwd, name)
     --++
     env.ECR_PUSH = function(repo, cname, tag)
         msg.debug("PUSH %s:%s", cname, tag)
-        rmutils()
+        rm_util_buildah()
         local tmpname = F("%s.%s", cname, util.random_string(16))
         popen("buildah commit --format docker --squash --rm %s dir:%s", name, tmpname)
         local _, r = popen("/usr/bin/aws ecr get-login")
@@ -249,7 +249,7 @@ local from = function(base, cwd, name)
     --++
     env.LOCAL_PUSH = function(repo, creds, cname, tag)
         msg.debug("PUSH %s:%s", cname, tag)
-        rmutils()
+        rm_util_buildah()
         local tmpname = F("%s.%s", cname, util.random_string(16))
         popen("buildah commit --format docker --squash --rm %s dir:%s", name, tmpname)
         popen("/usr/bin/skopeo copy --dcreds %s dir:%s docker://%s/%s:%s", creds, tmpname, repo, cname, tag)
@@ -266,7 +266,7 @@ local from = function(base, cwd, name)
     --++
     env.XPUSH = function(repo, creds, cname, tag, ...)
         msg.debug("PUSH %s:%s", cname, tag)
-        rmutils()
+        rm_util_buildah()
         local tmpname = F("%s.%s", cname, util.random_string(16))
         popen("buildah commit --format docker --squash --rm %s dir:%s", name, tmpname)
         popen("/usr/bin/skopeo copy --dest-tls-verify=false --dest-creds %s dir:%s docker://%s/%s:%s", creds, tmpname, repo, cname, tag)
