@@ -23,9 +23,9 @@ local from = function(base, cwd, name)
     if not (cwd == ".") then
        dir = "../buildah.d"
     end
-    local top = "./"
+    local top = "."
     if not (cwd == ".") then
-       top = "../"
+       top = ".."
     end
     local util_buildah = "/____util-buildah"
 
@@ -163,15 +163,15 @@ local from = function(base, cwd, name)
     --++ > NOTE: This finalizes the `buildah` run.
     --++
     env.WRITE = function(cname)
-        msg.debug("WRITE containers-storage:%s", cname)
+        msg.debug("WRITE dir:%s", cname)
         rm_util_buildah()
         local tmpname = F("%s.%s", cname, util.random_string(16))
-        popen("buildah commit --rm --squash %s dir:%s", name, tmpname)
-        popen([[mv $(find %s -maxdepth 1 -type f -exec file {} \+ | awk -F\: '/archive/{print $1}') %s.tar]], tmpname, tmpname)
-        popen("mkdir %s", cname)
-        popen("tar -C %s -xvf %s.tar", cname, tmpname)
-        popen("rm -f %s.tar", tmpname)
-        popen("rm -rf %s", cname)
+        popen("buildah commit --rm --squash %s dir:%s/%s", name, top, tmpname)
+        popen([[mv $(find %s/%s -maxdepth 1 -type f -exec file {} \+ | awk -F\: '/archive/{print $1}') %s/%s.tar]], top, tmpname, top, tmpname)
+        popen("mkdir %s/%s", top, cname)
+        popen("tar -C %s/%s -xvf %s/%s.tar", top, cname, top, tmpname)
+        popen("rm -f %s/%s.tar", top, tmpname)
+        popen("rm -rf %s/%s", top, tmpname)
         msg.ok("Wrote dir:%s", cname)
     end
     --++ ### ARCHIVE(name)
