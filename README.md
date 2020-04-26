@@ -1,5 +1,5 @@
 # buildah.lua
-opinionated buildah wrapper for Lua 5.1, LuaJIT, MoonScript
+opinionated buildah wrapper for MoonScript(LuaJIT/Lua 5.1).
 
 
 # EXAMPLE
