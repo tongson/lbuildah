@@ -17,20 +17,12 @@ local HOME = os.getenv "HOME"
 --++ *cwd* is an optional string that sets the current working directory for the subsequent `buildah` commands.
 --++
 --++ # DSL
-local from = function(base, cwd, name)
-    cwd = cwd or "."
+local from = function(base, assets, name)
+    assets = assets or "."
     local dir = "./buildah.d"
-    if not (cwd == ".") then
-       dir = "../buildah.d"
-    end
-    local top = "."
-    if not (cwd == ".") then
-       top = ".."
-    end
     local util_buildah = "/____util-buildah"
 
     local popen = exec.ctx()
-    popen.cwd = cwd
     popen.env = { USER = USER, HOME = HOME }
     if not name then
         popen("buildah rm -a")
@@ -71,7 +63,7 @@ local from = function(base, cwd, name)
     --++
     env.SCRIPT = function(a)
         msg.debug("SCRIPT %s", a)
-        popen("buildah copy %s %s /%s", name, a, a)
+        popen("buildah copy %s %s/%s /%s", name, assets, a, a)
         popen("buildah run %s -- sh /%s", name, a)
         popen("buildah run %s -- %s/rm /%s", name, util_buildah, a)
     end
@@ -99,7 +91,7 @@ local from = function(base, cwd, name)
     env.COPY = function(src, dest)
         dest = dest or '/'
         msg.debug("COPY '%s' to '%s'", src, dest)
-        popen("buildah copy %s %s %s", name, src, dest)
+        popen("buildah copy %s %s/%s %s", name, assets, src, dest)
     end
     --++ ### MKDIR(directory, [mode])
     --++ Create directory within container.
@@ -166,12 +158,12 @@ local from = function(base, cwd, name)
         msg.debug("WRITE dir:%s", cname)
         rm_util_buildah()
         local tmpname = F("%s.%s", cname, util.random_string(16))
-        popen("buildah commit --rm --squash %s dir:%s/%s", name, top, tmpname)
-        popen([[mv $(find %s/%s -maxdepth 1 -type f -exec file {} \+ | awk -F\: '/archive/{print $1}') %s/%s.tar]], top, tmpname, top, tmpname)
-        popen("mkdir %s/%s", top, cname)
-        popen("tar -C %s/%s -xvf %s/%s.tar", top, cname, top, tmpname)
-        popen("rm -f %s/%s.tar", top, tmpname)
-        popen("rm -rf %s/%s", top, tmpname)
+        popen("buildah commit --rm --squash %s dir:%s", name, tmpname)
+        popen([[mv $(find %s -maxdepth 1 -type f -exec file {} \+ | awk -F\: '/archive/{print $1}') %s.tar]], tmpname, tmpname)
+        popen("mkdir %s", cname)
+        popen("tar -C %s -xvf %s.tar", cname, tmpname)
+        popen("rm -f %s.tar", tmpname)
+        popen("rm -rf %s", tmpname)
         msg.ok("Wrote dir:%s", cname)
     end
     --++ ### ARCHIVE(name)
@@ -181,7 +173,7 @@ local from = function(base, cwd, name)
     env.ARCHIVE = function(cname)
         msg.debug("ARCHIVE oci:%s", cname)
         rm_util_buildah()
-        popen("buildah commit --rm --squash %s oci-archive:%s/%s", name, top, cname)
+        popen("buildah commit --rm --squash %s oci-archive:%s", name, cname)
         msg.ok("OCI image %s", cname)
     end
     --++ ### CONTAINERS_STORAGE(name)
@@ -229,7 +221,7 @@ local from = function(base, cwd, name)
         popen("buildah commit --format docker --squash --rm %s dir:%s", name, tmpname)
         popen("/usr/bin/skopeo copy --dcreds %s dir:%s docker://%s/%s:%s", creds, tmpname, repo, cname, tag)
         popen("/usr/bin/skopeo copy dir:%s containers-storage:%s:%s", tmpname, cname, tag)
-        os.execute(F("rm -r %s/%s", cwd, tmpname))
+        popen("rm -r %s", tmpname)
         msg.ok("Pushed %s:%s", cname, tag)
     end
     env.PUSH = env.LOCAL_PUSH
