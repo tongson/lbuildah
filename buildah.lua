@@ -10,7 +10,7 @@ local M = {}
 local USER = os.getenv "USER"
 local HOME = os.getenv "HOME"
 --++ # BUILDAH MODULE
---++ ## buildah.from(base, main, [cwd])
+--++ ## buildah.from(base, [cwd])
 --++ Returns a function that executes the *main* `buildah` routine containing the `buildah` DSL.
 --++
 --++ *base* is a required string indicating the container image to base from. (e.g. `docker://docker.io/library/debian:stable-slim`)
