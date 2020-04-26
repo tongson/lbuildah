@@ -200,6 +200,7 @@ local from = function(base, cwd, name)
     end
     env.STORAGE = env.CONTAINERS_STORAGE
     env.COMMIT = env.CONTAINERS_STORAGE
+    env.STORE = env.CONTAINERS_STORAGE
     --++ ### ECR_PUSH(repository, name, tag)
     --++ Push container to AWS ECR under *name:tag*.
     --++ Requires `aws-cli` and AWS ECR credentials.
