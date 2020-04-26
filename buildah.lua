@@ -102,7 +102,7 @@ local from = function(base, cwd, name)
     --++
     env.MKDIR = function(d)
         msg.debug("MKDIR %s", d)
-        popen("buildah run %s -- mkdir -p %s", name, d)
+        popen("buildah run %s -- %s/mkdir %s", name, util_buildah, d)
     end
     --++ ### RM(file)
     --++ Deletes the string *file*.
@@ -112,11 +112,11 @@ local from = function(base, cwd, name)
         if type(f) == "table" and next(f) then
             msg.debug("RM (table)")
             for _, r in ipairs(f) do
-                popen("buildah run %s -- rm -rf %s", name, r)
+                popen("buildah run %s -- %s/rm %s", name, util_buildah, r)
             end
         else
             msg.debug("RM %s", f)
-            popen("buildah run %s -- rm -rf %s", name, f)
+            popen("buildah run %s -- %s/rm %s", name, util_buildah, f)
         end
     end
     --++ ### ENTRYPOINT(executable)
