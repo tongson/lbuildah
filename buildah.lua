@@ -20,10 +20,14 @@ local HOME = os.getenv "HOME"
 local from = function(base, cwd, name)
     cwd = cwd or "."
     local dir = "./buildah.d/"
-    if not (cwd ==  ".") then
+    if not (cwd == ".") then
        dir = "../buildah.d/"
     end
-    local util_buildah = "/____util-buildah/"
+    local top = "./"
+    if not (cwd == ".") then
+       top = "../"
+    end
+    local util_buildah = "/____util-buildah"
 
     local popen = exec.ctx()
     popen.cwd = cwd
