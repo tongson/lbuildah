@@ -248,7 +248,7 @@ local from = function(base, cwd, name)
         for _, newtag in ipairs{...} do
             popen("/usr/bin/skopeo copy --src-tls-verify=false --dest-tls-verify=false --src-creds %s --dest-creds %s docker://%s/%s:%s docker://%s/%s:%s", creds, creds, repo, cname, tag, repo, cname, newtag)
         end
-        os.execute(F("rm -r %s/%s", cwd, tmpname))
+        popen("rm -r %s", tmpname)
         msg.ok("Pushed %s:%s", cname, tag)
     end
     -- ### CACHE(host, name, src, dest)
