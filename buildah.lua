@@ -181,7 +181,7 @@ local from = function(base, cwd, name)
     env.ARCHIVE = function(cname)
         msg.debug("ARCHIVE oci:%s", cname)
         rm_util_buildah()
-        popen("buildah commit --rm --squash %s oci-archive:%s", name, cname)
+        popen("buildah commit --rm --squash %s oci-archive:%s/%s", name, top, cname)
         msg.ok("OCI image %s", cname)
     end
     --++ ### CONTAINERS_STORAGE(name)
