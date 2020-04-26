@@ -100,7 +100,7 @@ local from = function(base, cwd, name)
     --++ ### MKDIR(directory, [mode])
     --++ Create directory within container.
     --++
-    --++ Optional directory mode in octal.
+    --++ Optional directory mode in octal. Default is 0755.
     --++
     env.MKDIR = function(d, m)
         m = m or ""
