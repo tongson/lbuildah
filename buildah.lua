@@ -167,7 +167,7 @@ local from = function(base, cwd, name)
         popen("mkdir %s", cname)
         popen("tar -C %s -xvf %s.tar", cname, tmpname)
         popen("rm -f %s.tar", tmpname)
-        popen("rm -rf %s", cname))
+        popen("rm -rf %s", cname)
         msg.ok("Wrote dir:%s", cname)
     end
     --++ ### ARCHIVE(name)
