@@ -19,9 +19,9 @@ local HOME = os.getenv "HOME"
 --++ # DSL
 local from = function(base, cwd, name)
     cwd = cwd or "."
-    local dir = "./buildah.d/"
+    local dir = "./buildah.d"
     if not (cwd == ".") then
-       dir = "../buildah.d/"
+       dir = "../buildah.d"
     end
     local top = "./"
     if not (cwd == ".") then
