@@ -97,21 +97,6 @@ local from = function(base, cwd, name)
         msg.debug("COPY '%s' to '%s'", src, dest)
         popen("buildah copy %s %s %s", name, src, dest)
     end
-    --++ ### CLEAR(directory)
-    --++ Deletes all files and directories one level down from the string *directory*.
-    --++ If a list(table) is given, then each directory(string) is cleared.
-    --++
-    env.CLEAR = function(d)
-        if type(d) == "table" and next(d) then
-            msg.debug("CLEAR (table)")
-            for _, r in ipairs(d) do
-                popen("buildah run %s -- /usr/bin/find %s -mindepth 1 -ignore_readdir_race -delete", name, r)
-            end
-        else
-            msg.debug("CLEAR %s", d)
-            popen("buildah run %s -- /usr/bin/find %s -mindepth 1 -ignore_readdir_race -delete", name, d)
-        end
-    end
     --++ ### MKDIR(directory)
     --++ Create directory within container.
     --++
