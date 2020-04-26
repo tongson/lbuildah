@@ -19,6 +19,12 @@ local HOME = os.getenv "HOME"
 --++ # DSL
 local from = function(base, cwd, name)
     cwd = cwd or "."
+    local dir = "./buildah.d/"
+    if not (cwd ==  ".") then
+       dir = "../buildah.d/"
+    end
+    local utils = "/____util-buildah/"
+
     local popen = exec.ctx()
     popen.cwd = cwd
     popen.env = { USER = USER, HOME = HOME }
@@ -31,6 +37,20 @@ local from = function(base, cwd, name)
     else
         msg.ok(F("Reusing %s.", name))
     end
+
+    popen("buildah add %s '%s/util-buildah.tar.xz' '%s'", name, dir, utils)
+    msg.debug"Copied util-buildah."
+
+    local mount do
+        local _, res = popen("buildah mount --notruncate %s", name)
+        mount = res.output[1]
+    end
+
+    local rmutils = function()
+	popen("test -d %s/%s", mount, utils)
+	popen("rm -rf %s/%s", mount, utils)
+    end
+
     local env = {}
     setmetatable(env, {__index = function(_, value)
         return rawget(env, value) or rawget(_G, value)
@@ -169,6 +189,7 @@ local from = function(base, cwd, name)
     --++
     env.WRITE = function(cname)
         msg.debug("WRITE containers-storage:%s", cname)
+        rmutils()
         local tmpname = F("%s.%s", cname, util.random_string(16))
         popen("buildah commit --rm --squash %s dir:%s", name, tmpname)
         popen([[mv $(find %s -maxdepth 1 -type f -exec file {} \+ | awk -F\: '/archive/{print $1}') %s.tar]], tmpname, tmpname)
@@ -184,6 +205,7 @@ local from = function(base, cwd, name)
     --++
     env.ARCHIVE = function(cname)
         msg.debug("ARCHIVE oci:%s", cname)
+        rmutils()
         popen("buildah commit --rm --squash %s oci-archive:%s", name, cname)
         msg.ok("OCI image %s", cname)
     end
@@ -195,6 +217,7 @@ local from = function(base, cwd, name)
     env.CONTAINERS_STORAGE = function(cname, tag)
         tag = tag or "latest"
         msg.debug("CONTAINERS-STORAGE %s:%s", cname, tag)
+        rmutils()
         popen("buildah commit --rm --squash %s containers-storage:%s:%s", name, cname, tag)
         msg.ok("Committed image %s", cname)
     end
@@ -208,6 +231,7 @@ local from = function(base, cwd, name)
     --++
     env.ECR_PUSH = function(repo, cname, tag)
         msg.debug("PUSH %s:%s", cname, tag)
+        rmutils()
         local tmpname = F("%s.%s", cname, util.random_string(16))
         popen("buildah commit --format docker --squash --rm %s dir:%s", name, tmpname)
         local _, r = popen("/usr/bin/aws ecr get-login")
@@ -225,6 +249,7 @@ local from = function(base, cwd, name)
     --++
     env.LOCAL_PUSH = function(repo, creds, cname, tag)
         msg.debug("PUSH %s:%s", cname, tag)
+        rmutils()
         local tmpname = F("%s.%s", cname, util.random_string(16))
         popen("buildah commit --format docker --squash --rm %s dir:%s", name, tmpname)
         popen("/usr/bin/skopeo copy --dcreds %s dir:%s docker://%s/%s:%s", creds, tmpname, repo, cname, tag)
@@ -241,6 +266,7 @@ local from = function(base, cwd, name)
     --++
     env.XPUSH = function(repo, creds, cname, tag, ...)
         msg.debug("PUSH %s:%s", cname, tag)
+        rmutils()
         local tmpname = F("%s.%s", cname, util.random_string(16))
         popen("buildah commit --format docker --squash --rm %s dir:%s", name, tmpname)
         popen("/usr/bin/skopeo copy --dest-tls-verify=false --dest-creds %s dir:%s docker://%s/%s:%s", creds, tmpname, repo, cname, tag)
