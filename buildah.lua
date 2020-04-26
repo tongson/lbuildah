@@ -277,7 +277,7 @@ local from = function(base, cwd, name)
         popen("rm IMAGE.tar.xz")
         os.execute(F("rm -r %s/%s", cwd, tmpname))
     end
-    setfenv(2, env)
+    return setfenv(2, env)
 end
 
 M.from = from
