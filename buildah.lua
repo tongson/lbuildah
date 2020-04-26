@@ -43,7 +43,7 @@ local from = function(base, cwd, name)
     end
 
     popen("buildah add %s '%s/util-buildah.tar.xz' '%s'", name, dir, util_buildah)
-    msg.debug"Copied util-buildah."
+    msg.ok"Copied util-buildah executables to container root."
 
     local mount do
         local _, res = popen("buildah mount --notruncate %s", name)
