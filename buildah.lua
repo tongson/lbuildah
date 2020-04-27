@@ -267,6 +267,24 @@ local from = function(base, assets, name)
         popen("rm IMAGE.tar.xz")
         os.execute(F("rm -r %s/%s", cwd, tmpname))
     end
+    env.WIPE = function(a)
+        if a == "directories" then
+            msg.debug("WIPE (recreating empty directories)")
+            popen("buildah run %s -- %s/wipe_dirs", name, util_buildah)
+        end
+        if a == "dpkg" then
+            msg.debug("WIPE (removing apt/dpkg and dependencies)")
+            popen("buildah run %s -- %s/wipe_dpkg", name, util_buildah)
+        end
+        if a == "userland" then
+            msg.debug("WIPE (removing userland)")
+            popen("buildah run %s -- %s/wipe_userland", name, util_buildah)
+        end
+        if a == "docs" then
+            msg.debug("WIPE (documentation)")
+            popen("buildah run %s -- %s/wipe_docs", name, util_buildah)
+        end
+    end
     setfenv(2, env)
 end
 
