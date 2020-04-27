@@ -76,6 +76,14 @@ local from = function(base, assets, name)
         msg.debug("RUN apt-get %s", a)
         popen("buildah run %s -- %s %s", name, apt, a)
     end
+    --++ ### APT_PURGE(arguments)
+    --++ Wraps dpkg command to purge a package.
+    --++
+    env.APT_PURGE = function(a)
+        local dpkg = [[dpkg --purge --no-triggers --force-remove-essential --force-breaks --force-unsafe-io]]
+        msg.debug("RUN dpkg --purge %s", a)
+        popen("buildah run %s -- %s %s", name, dpkg, a)
+    end
     --++ ### ZYPPER(arguments)
     --++ Wraps the /openSUSE/ `zypper` command.
     --++
