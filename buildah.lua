@@ -45,6 +45,7 @@ local from = function(base, assets, name)
     local rm_util_buildah = function()
 	popen("test -d %s/%s", mount, util_buildah)
 	popen("rm -rf %s/%s", mount, util_buildah)
+	popen("buildah unmount %s", name)
     end
 
     local env = {}
