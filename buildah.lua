@@ -19,7 +19,7 @@ local HOME = os.getenv "HOME"
 --++ # DSL
 local from = function(base, assets, name)
     assets = assets or "."
-    local dir = "./buildah.d"
+    local dir = "./buildah"
     local util_buildah = "/____util-buildah"
 
     local popen = exec.ctx()
