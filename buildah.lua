@@ -273,9 +273,13 @@ local from = function(base, assets, name)
             msg.debug("WIPE (recreating empty directories)")
             popen("buildah run %s -- %s/wipe_dirs", name, util_buildah)
         end
-        if a == "dpkg" then
+        if a == "debian" then
             msg.debug("WIPE (removing apt/dpkg and dependencies)")
-            popen("buildah run %s -- %s/wipe_dpkg", name, util_buildah)
+            popen("buildah run %s -- %s/wipe_debian", name, util_buildah)
+        end
+        if a == "perl" then
+            msg.debug("WIPE (removing perl)")
+            popen("buildah run %s -- %s/wipe_perl", name, util_buildah)
         end
         if a == "userland" then
             msg.debug("WIPE (removing userland)")
