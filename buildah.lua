@@ -240,8 +240,10 @@ local from = function(base, assets, name)
     --++ Alias: PUSH
     --++ > NOTE: This finalizes the `buildah` run.
     --++
-    env.XPUSH = function(repo, creds, cname, tag, ...)
+    env.XPUSH = function(cname, tag, ...)
         msg.debug("PUSH %s:%s", cname, tag)
+        local repo = os.getenv("BUILDAH_REPO")
+        local creds = os.getenv("BUILDAH_CRED")
         rm_util_buildah()
         local tmpname = F("%s.%s", cname, util.random_string(16))
         popen("buildah commit --format docker --squash --rm %s dir:%s", name, tmpname)
