@@ -241,6 +241,7 @@ local from = function(base, assets, name)
     --++ > NOTE: This finalizes the `buildah` run.
     --++
     env.XPUSH = function(cname, tag, ...)
+        tag = tag or "latest"
         msg.debug("PUSH %s:%s", cname, tag)
         local repo = os.getenv("BUILDAH_REPO")
         local creds = os.getenv("BUILDAH_CRED")
