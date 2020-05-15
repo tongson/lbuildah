@@ -220,7 +220,7 @@ local from = function(base, assets, name)
         local ecrpass = string.match(r.output[1], "^docker%slogin%s%-u%sAWS%s%-p%s([A-Za-z0-9=]+)%s.*$")
         popen("/usr/bin/skopeo copy --dcreds AWS:%s dir:%s %s/%s:%s", ecrpass, tmpname, repo, cname, tag)
         popen("/usr/bin/skopeo copy dir:%s containers-storage:%s:%s", tmpname, cname, tag)
-        os.execute(F("rm -r %s/%s", cwd, tmpname))
+        os.execute(F("rm -r %s", tmpname))
         msg.ok("Pushed %s:%s", cname, tag)
     end
     --++ ### LOCAL_PUSH(repository, credentials, name, tag)
