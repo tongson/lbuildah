@@ -34,18 +34,24 @@ local from = function(base, assets, name)
         msg.ok(F("Reusing %s.", name))
     end
 
-    popen("buildah add %s '%s/util-buildah.tar.xz' '%s'", name, dir, util_buildah)
+    if not (base == "scratch") then
+        popen("buildah add %s '%s/util-buildah.tar.xz' '%s'", name, dir, util_buildah)
+    end
     msg.ok"Copied util-buildah executables to container root."
 
     local mount do
-        local _, res = popen("buildah mount --notruncate %s", name)
-        mount = res.output[1]
+        if not (base == "scratch") then
+            local _, res = popen("buildah mount --notruncate %s", name)
+            mount = res.output[1]
+        end
     end
 
     local rm_util_buildah = function()
-	popen("test -d %s/%s", mount, util_buildah)
-	popen("rm -rf %s/%s", mount, util_buildah)
-	popen("buildah unmount %s", name)
+        if not (base == "scratch") then
+	    popen("test -d %s/%s", mount, util_buildah)
+	    popen("rm -rf %s/%s", mount, util_buildah)
+	    popen("buildah unmount %s", name)
+        end
     end
 
     local env = {}
