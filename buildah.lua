@@ -275,7 +275,7 @@ local from = function(base, assets, name)
         popen("XZ_OPT=-T0 /usr/bin/tar -C %s -cJf IMAGE.tar.xz %s", tmpname, cname)
         popen("/usr/bin/scp IMAGE.tar.xz %s/%s/%s", ssh, cname, dtag)
         popen("rm IMAGE.tar.xz")
-        os.execute(F("rm -r %s/%s", cwd, tmpname))
+        os.execute(F("rm -r %s", tmpname))
     end
     env.WIPE = function(a)
         if a == "directories" then
