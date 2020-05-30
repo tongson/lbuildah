@@ -39,18 +39,10 @@ local from = function(base, assets, name)
     end
     msg.ok"Copied util-buildah executables to container root."
 
-    local mount do
-        if not (base == "scratch") then
-            local _, res = popen("buildah mount --notruncate %s", name)
-            mount = res.output[1]
-        end
-    end
-
     local rm_util_buildah = function()
         if not (base == "scratch") then
-	    popen("test -d %s/%s", mount, util_buildah)
-	    popen("rm -rf %s/%s", mount, util_buildah)
-	    popen("buildah unmount %s", name)
+	    popen("buildah unshare --mount ____util_buildah=%s sh -c 'test -d ${____util_buildah}%s'", name, util_buildah)
+	    popen("buildah unshare --mount ____util_buildah=%s sh -c 'rm -rf ${____util_buidah}%s'", name, util_buildah)
         end
     end
 
