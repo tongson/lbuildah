@@ -221,13 +221,17 @@ local from = function(base, assets, name)
     --++ Alias: PUSH
     --++ > NOTE: This finalizes the `buildah` run.
     --++
-    env.LOCAL_PUSH = function(repo, creds, cname, tag)
+    env.LOCAL_PUSH = function(cname, tag, ...)
         msg.debug("PUSH %s:%s", cname, tag)
+        local repo = os.getenv("BUILDAH_REPO")
+        local creds = os.getenv("BUILDAH_CRED")
         rm_util_buildah()
         local tmpname = F("%s.%s", cname, util.random_string(16))
         popen("buildah commit --format docker --squash --rm %s dir:%s", name, tmpname)
         popen("/usr/bin/skopeo copy --dcreds %s dir:%s docker://%s/%s:%s", creds, tmpname, repo, cname, tag)
-        popen("/usr/bin/skopeo copy dir:%s containers-storage:%s:%s", tmpname, cname, tag)
+        for _, newtag in ipairs{...} do
+            popen("/usr/bin/skopeo copy --src-creds %s --dest-creds %s docker://%s/%s:%s docker://%s/%s:%s", creds, creds, repo, cname, tag, repo, cname, newtag)
+        end
         popen("rm -r %s", tmpname)
         msg.ok("Pushed %s:%s", cname, tag)
     end
