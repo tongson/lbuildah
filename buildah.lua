@@ -41,8 +41,8 @@ local from = function(base, assets, name)
 
     local rm_util_buildah = function()
         if not (base == "scratch") then
-	    popen("buildah unshare --mount ____util_buildah=%s sh -c 'test -d ${____util_buildah}%s'", name, util_buildah)
-	    popen("buildah unshare --mount ____util_buildah=%s sh -c 'rm -rf ${____util_buidah}%s'", name, util_buildah)
+	    popen("buildah unshare --mount %s sh -c 'test -d ${%s}%s'", name, name, util_buildah)
+	    popen("buildah unshare --mount %s sh -c 'rm -rf ${%s}%s'", name, name, util_buildah)
         end
     end
 
