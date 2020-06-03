@@ -13,7 +13,8 @@ local HOME = os.getenv "HOME"
 --++ ## buildah.from(base, [assets])
 --++ Returns a function that executes the *main* `buildah` routine containing the `buildah` DSL.
 --++
---++ *base* is a required string indicating the container image to base from. (e.g. `docker://docker.io/library/debian:stable-slim`)
+--++ *base* is a required string indicating the container image to base from.
+--++     example: `docker://docker.io/library/debian:stable-slim`
 --++ *assets* is an optional string that corresponds to the assets directory.
 --++
 --++ # DSL
