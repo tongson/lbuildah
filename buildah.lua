@@ -21,7 +21,7 @@ local HOME = os.getenv "HOME"
 local from = function(base, assets, name)
     assets = assets or "."
     local dir = "./buildah"
-    local util_buildah = "/____util-buildah"
+    local util_buildah = "/.buildah"
 
     local popen = exec.ctx()
     popen.env = { USER = USER, HOME = HOME }
@@ -40,19 +40,17 @@ local from = function(base, assets, name)
     end
     msg.ok"Copied util-buildah executables to container root."
 
-    local mount do
-        if not (base == "scratch") then
-            local _, res = popen("buildah mount --notruncate %s", name)
-            mount = res.output[1]
-        end
-    end
-
     local rm_util_buildah = function()
        if not (base == "scratch") then
-           popen("test -d %s/%s", mount, util_buildah)
-           popen("rm -rf %s/%s", mount, util_buildah)
-           popen("buildah unmount %s", name)
-       end
+           popen("buildah run %s -- %s/rm %s/wipe_docs", name, util_buildah, util_buildah)
+           popen("buildah run %s -- %s/rm %s/wipe_userland", name, util_buildah, util_buildah)
+           popen("buildah run %s -- %s/rm %s/wipe_debian", name, util_buildah, util_buildah)
+           popen("buildah run %s -- %s/rm %s/wipe_perl", name, util_buildah, util_buildah)
+           popen("buildah run %s -- %s/rm %s/wipe_dirs", name, util_buildah, util_buildah)
+           popen("buildah run %s -- %s/rm %s/mkdir", name, util_buildah, util_buildah)
+           popen("buildah run %s -- %s/rm %s/chmod", name, util_buildah, util_buildah)
+           popen("buildah run %s -- %s/rm %s/rm", name, util_buildah, util_buildah)
+        end
     end
 
     local env = {}
