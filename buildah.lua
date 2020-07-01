@@ -47,6 +47,7 @@ local from = function(base, assets, name)
            popen("buildah run %s -- %s/rm %s/wipe_debian", name, util_buildah, util_buildah)
            popen("buildah run %s -- %s/rm %s/wipe_perl", name, util_buildah, util_buildah)
            popen("buildah run %s -- %s/rm %s/wipe_dirs", name, util_buildah, util_buildah)
+           popen("buildah run %s -- %s/rm %s/wipe_sh", name, util_buildah, util_buildah)
            popen("buildah run %s -- %s/rm %s/mkdir", name, util_buildah, util_buildah)
            popen("buildah run %s -- %s/rm %s/chmod", name, util_buildah, util_buildah)
            popen("buildah run %s -- %s/rm %s/rm", name, util_buildah, util_buildah)
@@ -300,6 +301,10 @@ local from = function(base, assets, name)
         if a == "docs" then
             msg.debug("WIPE (documentation)")
             popen("buildah run %s -- %s/wipe_docs", name, util_buildah)
+        end
+        if a == "sh" then
+            msg.debug("WIPE (removing sh)")
+            popen("buildah run %s -- %s/wipe_sh", name, util_buildah)
         end
     end
     setfenv(2, env)
