@@ -1,6 +1,6 @@
 # buildah.lua
-opinionated buildah wrapper for MoonScript(LuaJIT/Lua 5.1).
-
+Opinionated buildah wrapper. <br />
+Write your Dockerfile as Moonscript.
 
 # EXAMPLE
 Creates Alpine Linux container with nginx as ENTRYPOINT then save to containers-storage.
