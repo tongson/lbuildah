@@ -57,21 +57,24 @@ local from = function(base, cid, assets)
   --# === RUN(command)
   --# Runs the *command* within the container.
   --#
-  env.RUN = function(a)
-    local r, so, se = buildah{
+  env.RUN = function(...)
+    local a = buildah{
       'run';
       name;
       '--';
-      a;
     }
+    for _, v in ipairs({...}) do
+      table.insert(a, v)
+    end
+    local r, so, se = buildah(a)
     panic(r, 'RUN', {
       id = name;
-      command = a;
+      command = table.concat({...})
       stdout = so;
       stderr = se;
     })
     ok('RUN: Success', {
-      command = a;
+      command = table.concat({...})
     })
   end
   --++ ### SCRIPT(file)
