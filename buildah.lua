@@ -1,7 +1,7 @@
 -- Requires buildah, skopeo
 local F = string.format
 local C = table.concat
-local I = table.insert
+local G = string.gmatch
 local ok = require 'stdout'.info
 local stderr = require 'stderr'
 local panic = function(ret, msg, tbl)
@@ -22,7 +22,7 @@ local HOME = os.getenv "HOME"
 --#
 --# === DSL
 local from = function(base, cid, assets)
-  assets = assets or '.'
+  assets = assets or fs.currentdir()
   local util_buildah = assets.."/util-buildah.20210415"
   local buildah = exec.ctx 'buildah'
   buildah.env = { USER = USER, HOME = HOME }
@@ -59,24 +59,26 @@ local from = function(base, cid, assets)
   --# === RUN(command)
   --# Runs the *command* within the container.
   --#
-  env.RUN = function(...)
+  env.RUN = function(v)
     local a = {
       'run';
       name;
       '--';
     }
-    for _, v in ipairs({...}) do
-      I(a, v)
+    local run = {}
+    for k in G(v, '%S+') do
+      run[#run+1] = k
+      a[#a+1] = k
     end
     local r, so, se = buildah(a)
     panic(r, 'RUN', {
       id = name;
-      command = C({...});
+      command = C(run, ' ');
       stdout = so;
       stderr = se;
     })
     ok('RUN', {
-      command = C({...});
+      command = C(run, ' ');
     })
   end
   --++ ### SCRIPT(file)
@@ -105,7 +107,7 @@ local from = function(base, cid, assets)
   --++ Wraps the /Debian/ `apt-get` command.
   --++ Usually used installing packages (.e.g. `APT_GET install build-essential`)
   --++
-  env.APT_GET = function(command, ...)
+  env.APT_GET = function(v)
     local a = {
       'run';
       name;
@@ -126,21 +128,22 @@ local from = function(base, cid, assets)
       [[Dpkg::Options::='--force-confnew']];
       '-o';
       [[DPkg::options::='--force-unsafe-io']];
-      command;
     }
-    for _, v in ipairs({...}) do
-      I(a, v)
+    local run = {}
+    for k in G(v, '%S+') do
+      run[#run+1] = k
+      a[#a+1] = k
     end
     local r, so, se = buildah(a)
     panic(r, 'APT_GET', {
-      command = command;
-      arg = C({...});
+      command = run[1];
+      arg = C(run, ' ', 2);
       stdout = so;
       stderr = se;
     })
     ok('APT_GET', {
-      command = command;
-      arg = C({...});
+      command = run[1];
+      arg = C(run, ' ', 2);
     })
   end
   --++ ### APT_PURGE(arguments)
