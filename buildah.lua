@@ -1,5 +1,7 @@
 -- Requires buildah, skopeo
 local F = string.format
+local C = table.concat
+local I = table.insert
 local ok = require 'stdout'.info
 local stderr = require 'stderr'
 local panic = function(ret, msg, tbl)
@@ -64,17 +66,17 @@ local from = function(base, cid, assets)
       '--';
     }
     for _, v in ipairs({...}) do
-      table.insert(a, v)
+      I(a, v)
     end
     local r, so, se = buildah(a)
     panic(r, 'RUN', {
       id = name;
-      command = table.concat({...})
+      command = C({...})
       stdout = so;
       stderr = se;
     })
     ok('RUN: Success', {
-      command = table.concat({...})
+      command = C({...})
     })
   end
   --++ ### SCRIPT(file)
@@ -103,8 +105,8 @@ local from = function(base, cid, assets)
   --++ Wraps the /Debian/ `apt-get` command.
   --++ Usually used installing packages (.e.g. `APT_GET install build-essential`)
   --++
-  env.APT_GET = function(command, rest)
-    local r, so, se = buildah{
+  env.APT_GET = function(command, ...)
+    local a = buildah{
       'run';
       name;
       '--';
@@ -125,17 +127,20 @@ local from = function(base, cid, assets)
       '-o';
       [[DPkg::options::='--force-unsafe-io']];
       command;
-      rest;
     }
+    for _, v in ipairs({...}) do
+      I(a, v)
+    end
+    local r, so, se = buildah(a)
     panic(r, 'APT_GET', {
       command = command;
-      arg = rest;
+      arg = C({...});
       stdout = so;
       stderr = se;
     })
     ok('APT_GET', {
       command = command;
-      arg = rest;
+      arg = C({...});
     })
   end
   --++ ### APT_PURGE(arguments)
