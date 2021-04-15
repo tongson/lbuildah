@@ -194,12 +194,14 @@ local from = function(base, cid, assets)
   --++ Copies the *source* file from the current directory to the the optional argument *destination*.
   --++ Writes to the root('/') directory if *destination* is not given.
   --++
-  env.COPY = function(src, dest)
-    dest = dest or '/'..src
+  env.COPY = function(src, dest, og)
+    og = og or 'root:root'
     local r, so, se = buildah{
       'copy';
+      '--chown';
+      og;
       name;
-      F('%s/%s', assets, src);
+      src;
       dest;
     }
     panic(r, 'COPY', {
