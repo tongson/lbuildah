@@ -275,57 +275,74 @@ local from = function(base, cid, assets)
       rm(f)
     end
   end
+  env.CONFIG = function(config)
+    for k, v in pairs(config) do
+      local r, so, se = buildah{
+        'config';
+        F('--%s', k);
+        F([['%s']], v);
+        name;
+      }
+      panic(r, 'CONFIG', {
+        config = k;
+        value = v;
+        stdout = so;
+        stderr = se;
+      })
+      ok('CONFIG', {
+        config = k;
+        value = v;
+      })
+   end
+  end
   --++ ### ENTRYPOINT(executable)
   --++ Sets the container entrypoint.
   --++ NOTE: Only accepts a single entrypoint item, usually the executable.
   --++
-  env.CONFIG = function(entrypoint, cmd, term)
-    cmd = cmd or [['']]
-    term = term or 'TERM'
+  env.ENTRYPOINT = function(entrypoint)
     local r, so, se = buildah{
       'config';
       '--entrypoint';
       F([['[\"%s\"]']], entrypoint);
       name;
     }
-    panic(r, 'CONFIG(entrypoint)', {
+    panic(r, 'ENTRYPOINT(exe)', {
       entrypoint = entrypoint;
       stdout = so;
       stderr = se;
     })
-    ok('CONFIG(entrypoint)', {
+    ok('ENTRYPOINTE(exe)', {
       entrypoint = entrypoint;
     })
     r, so, se = buildah{
       'config';
       '--cmd';
-      cmd;
+      [['']];
       name;
     }
-    panic(r, 'CONFIG(cmd)', {
-      cmd = cmd;
+    panic(r, 'ENTRYPOINT(cmd)', {
+      cmd = [['']]; 
       stdout = so;
       stderr = se;
     })
-    ok('CONFIG(cmd)', {
-      cmd = cmd;
+    ok('ENTRYPOINT(cmd)', {
+      cmd = [['']];
     })
     r, so, se= buildah{
       'config';
       '--stop-signal';
-      term;
+      'TERM';
       name;
     }
-    panic(r, 'CONFIG(term)', {
-      term = term;
+    panic(r, 'ENTRYPOINT(term)', {
+      term = 'TERM';
       stdout = so;
       stderr = se;
     })
-    ok('CONFIG(term)', {
-      term = term;
+    ok('ENTRYPOINT(term)', {
+      term = 'TERM';
     })
   end
-  env.ENTRYPOINT = env.CONFIG
   env.ARCHIVE = function(cname)
     local r, so, se = buildah{
       'commit';
