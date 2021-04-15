@@ -52,9 +52,11 @@ local from = function(base, cid, assets)
       name = name;
     })
   end
-  local env = {}
+  local env = {} 
   setmetatable(env, {__index = function(_, value)
-      return rawget(env, value) or rawget(_G, value)
+      return rawget(env, value) or 
+        rawget(_G, value) or
+        panic(nil, 'Unknown command or variable', { string = value })
   end})
   --# === RUN(command)
   --# Runs the *command* within the container.
