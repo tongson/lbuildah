@@ -60,7 +60,7 @@ local from = function(base, cid, assets)
   --# Runs the *command* within the container.
   --#
   env.RUN = function(...)
-    local a = buildah{
+    local a = {
       'run';
       name;
       '--';
@@ -106,7 +106,7 @@ local from = function(base, cid, assets)
   --++ Usually used installing packages (.e.g. `APT_GET install build-essential`)
   --++
   env.APT_GET = function(command, ...)
-    local a = buildah{
+    local a = {
       'run';
       name;
       '--';
