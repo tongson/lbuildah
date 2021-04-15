@@ -71,12 +71,12 @@ local from = function(base, cid, assets)
     local r, so, se = buildah(a)
     panic(r, 'RUN', {
       id = name;
-      command = C({...})
+      command = C({...});
       stdout = so;
       stderr = se;
     })
     ok('RUN: Success', {
-      command = C({...})
+      command = C({...});
     })
   end
   --++ ### SCRIPT(file)
