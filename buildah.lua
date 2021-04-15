@@ -313,7 +313,7 @@ local from = function(base, cid, assets)
       stdout = so;
       stderr = se;
     })
-    ok('ENTRYPOINTE(exe)', {
+    ok('ENTRYPOINT(exe)', {
       entrypoint = entrypoint;
     })
     r, so, se = buildah{
