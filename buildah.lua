@@ -13,14 +13,6 @@ end
 local ID = require 'uid'.new()
 local USER = os.getenv "USER"
 local HOME = os.getenv "HOME"
---# == buildah.from(base, [assets])
---# Returns a function that executes the *main* `buildah` routine containing the `buildah` DSL.
---#
---# *base* is a required string indicating the container image to base from.
---#     example: `docker://docker.io/library/debian:stable-slim`
---# *assets* is an optional string that corresponds to the assets directory.
---#
---# === DSL
 local from = function(base, cid, assets)
   assets = assets or fs.currentdir()
   local util_buildah = assets.."/util-buildah.20210415"
@@ -75,9 +67,6 @@ local from = function(base, cid, assets)
       destination = dest;
     })
   end
-  --# === RUN(command)
-  --# Runs the *command* within the container.
-  --#
   env.RUN = function(v)
     local a = {
       'run';
@@ -100,9 +89,6 @@ local from = function(base, cid, assets)
       command = C(run, ' ');
     })
   end
-  --++ ### SCRIPT(file)
-  --++ Runs the *file* within the container as a shell script.
-  --++
   env.SCRIPT = function(a)
     local r, so, se = buildah{
       'run';
@@ -122,10 +108,6 @@ local from = function(base, cid, assets)
       script = a;
     })
   end
-  --++ ### APT_GET(arguments)
-  --++ Wraps the /Debian/ `apt-get` command.
-  --++ Usually used installing packages (.e.g. `APT_GET install build-essential`)
-  --++
   env.APT_GET = function(v)
     local a = {
       'run';
@@ -165,9 +147,6 @@ local from = function(base, cid, assets)
       arg = C(run, ' ', 2);
     })
   end
-  --++ ### APT_PURGE(arguments)
-  --++ Wraps dpkg command to purge a package.
-  --++
   env.APT_PURGE = function(a)
     local r, so, se = buildah{
       'run';
@@ -190,10 +169,6 @@ local from = function(base, cid, assets)
       arg = a;
     })
   end
-  --++ ### COPY(source, destination)
-  --++ Copies the *source* file from the current directory to the the optional argument *destination*.
-  --++ Writes to the root('/') directory if *destination* is not given.
-  --++
   env.COPY = function(src, dest, og)
     og = og or 'root:root'
     local r, so, se = buildah{
@@ -215,11 +190,6 @@ local from = function(base, cid, assets)
       destination = dest;
     })
   end
-  --++ ### MKDIR(directory, [mode])
-  --++ Create directory within container.
-  --++
-  --++ Optional directory mode in octal. Default is 0755.
-  --++
   env.MKDIR = function(d, m)
     m = m or ""
     local r, so, se = buildah{
@@ -244,10 +214,6 @@ local from = function(base, cid, assets)
       mode = m;
     })
   end
-  --++ ### RM(file)
-  --++ Deletes the string *file*.
-  --++ If a list(table) is given, then each file(string) is deleted.
-  --++
   env.RM = function(f)
     local rm = function(ff)
       local r, so, se = buildah{
@@ -297,10 +263,6 @@ local from = function(base, cid, assets)
       })
    end
   end
-  --++ ### ENTRYPOINT(executable)
-  --++ Sets the container entrypoint.
-  --++ NOTE: Only accepts a single entrypoint item, usually the executable.
-  --++
   env.ENTRYPOINT = function(entrypoint)
     local r, so, se = buildah{
       'config';
