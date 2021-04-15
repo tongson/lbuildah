@@ -249,10 +249,9 @@ local from = function(base, assets, cid)
   --++ Sets the container entrypoint.
   --++ NOTE: Only accepts a single entrypoint item, usually the executable.
   --++
-  env.CONFIG = function(config)
-    local entrypoint = config.entrypoint
-    local cmd = config.cmd or [['']]
-    local term = config.term or 'TERM'
+  env.CONFIG = function(entrypoint, cmd, term)
+    cmd = cmd or [['']]
+    term = term or 'TERM'
     local r, so, se = buildah{
       'config';
       '--entrypoint';
