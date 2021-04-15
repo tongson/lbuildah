@@ -19,7 +19,7 @@ local HOME = os.getenv "HOME"
 --# *assets* is an optional string that corresponds to the assets directory.
 --#
 --# === DSL
-local from = function(base, assets, cid)
+local from = function(base, cid, assets)
   assets = assets or '.'
   local util_buildah = assets.."/util-buildah.20210415"
   local buildah = exec.ctx 'buildah'
