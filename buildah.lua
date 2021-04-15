@@ -295,6 +295,7 @@ local from = function(base, assets, cid)
       term = term;
     })
   end
+  env.ENTRYPOINT = env.CONFIG
   env.ARCHIVE = function(cname)
     local r, so, se = buildah{
       'commit';
