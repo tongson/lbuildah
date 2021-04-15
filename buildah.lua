@@ -28,10 +28,6 @@ local from = function(base, cid, assets)
   buildah.env = { USER = USER, HOME = HOME }
   local name = cid or ID
   if not cid then
-    buildah{
-      'rm';
-      '-a';
-    }
     local r, so, se = buildah{
       'from';
       '--name';
