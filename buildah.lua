@@ -75,7 +75,7 @@ local from = function(base, cid, assets)
       stdout = so;
       stderr = se;
     })
-    ok('RUN: Success', {
+    ok('RUN', {
       command = C({...});
     })
   end
