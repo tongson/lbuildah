@@ -54,6 +54,27 @@ local from = function(base, cid, assets)
         rawget(_G, value) or
         panic(nil, 'Unknown command or variable', { string = value })
   end})
+  env.ADD = function(src, dest, og)
+    og = og or 'root:root'
+    local r, so, se = buildah{
+      'add';
+      '--chown';
+      og;
+      name;
+      src;
+      dest;
+    }
+    panic(r, 'ADD', {
+      source = src;
+      destination = dest;
+      stdout = so;
+      stderr = se;
+    })
+    ok('ADD', {
+      source = src;
+      destination = dest;
+    })
+  end
   --# === RUN(command)
   --# Runs the *command* within the container.
   --#
