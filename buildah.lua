@@ -631,7 +631,8 @@ local FROM = function(base, cid, assets)
 			Format("oci-archive:%s", cname),
 		}
 		Buildah(a, "ARCHIVE", {
-			name = cname,
+			name = Name,
+			archive = cname,
 		})
 	end
 	env.DIR = function(dirname)
