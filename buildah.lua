@@ -293,7 +293,11 @@ local Concat = table.concat
 local Gmatch = string.gmatch
 local Sub = string.sub
 local Ok = require("stdout").info
-local Panic = require("stderr").error
+local Panic = function(msg, tbl)
+	local stderr = require("stderr").error
+	stderr.error(msg, tbl)
+	os.exit(1)
+end
 local buildah = exec.ctx("buildah")
 local Buildah = function(a, msg, tbl)
 	buildah.env = { USER = os.getenv("USER"), HOME = os.getenv("HOME") }
@@ -302,7 +306,6 @@ local Buildah = function(a, msg, tbl)
 		tbl.stdout = so
 		tbl.stderr = se
 		Panic(msg, tbl)
-		os.exit(1)
 	else
 		Ok(msg, tbl)
 	end
