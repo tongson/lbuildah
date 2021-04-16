@@ -2,7 +2,6 @@
 local Format = string.format
 local Concat = table.concat
 local Gmatch = string.gmatch
-local Find = string.find
 local Ok = require("stdout").info
 local Panic = require("stderr").error
 local buildah = exec.ctx("buildah")
@@ -50,7 +49,7 @@ local FROM = function(base, cid, assets)
 			"mount",
 			name,
 		})
-		if r and Find(so, "/var/lib/containers", 1, true) == 1 then
+		if r and not(so == "/") then
 			Ok("buildah mount", {
 				name = name,
 				mount = so,
