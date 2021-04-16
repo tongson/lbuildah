@@ -43,15 +43,15 @@ do
 end
 local FROM = function(base, cid, assets)
 	assets = assets or fs.currentdir()
-	local name = cid or require("uid").new()
+	local Name = cid or require("uid").new()
 	local Mount = function()
 		local r, so, se = buildah({
 			"mount",
-			name,
+			Name,
 		})
 		if not r or (so == "/") then
 			Panic("buildah mount", {
-				name = name,
+				name = Name,
 				stdout = so,
 				stderr = se,
 			})
@@ -61,11 +61,11 @@ local FROM = function(base, cid, assets)
 	local Unmount = function()
 		local r, so, se = buildah({
 			"unmount",
-			name,
+			Name,
 		})
 		if not r then
 			Panic("buildah unmount", {
-				name = name,
+				name = Name,
 				stdout = so,
 				stderr = se,
 			})
@@ -102,16 +102,16 @@ local FROM = function(base, cid, assets)
 		local a = {
 			"from",
 			"--name",
-			name,
+			Name,
 			base,
 		}
 		Buildah(a, "FROM", {
 			image = base,
-			name = name,
+			name = Name,
 		})
 	else
 		Ok("Reusing existing container", {
-			name = name,
+			name = Name,
 		})
 	end
 	local env = {}
@@ -128,7 +128,7 @@ local FROM = function(base, cid, assets)
 			"add",
 			"--chown",
 			og,
-			name,
+			Name,
 			src,
 			dest,
 		}
@@ -140,7 +140,7 @@ local FROM = function(base, cid, assets)
 	env.RUN = function(v)
 		local a = {
 			"run",
-			name,
+			Name,
 			"--",
 		}
 		local run = {}
@@ -149,7 +149,7 @@ local FROM = function(base, cid, assets)
 			a[#a + 1] = k
 		end
 		Buildah(a, "RUN", {
-			id = name,
+			name = Name,
 			command = Concat(run, " "),
 		})
 	end
@@ -158,7 +158,7 @@ local FROM = function(base, cid, assets)
 			"run",
 			"--volume",
 			Format("%s/%s:/%s", assets, s, s),
-			name,
+			Name,
 			"--",
 			"/bin/sh",
 			Format("/%s", s),
@@ -170,7 +170,7 @@ local FROM = function(base, cid, assets)
 	env.APT_GET = function(v)
 		local a = {
 			"run",
-			name,
+			Name,
 			"--",
 			"/usr/bin/env",
 			"LC_ALL=C",
@@ -202,7 +202,7 @@ local FROM = function(base, cid, assets)
 	env.APT_PURGE = function(p)
 		local a = {
 			"run",
-			name,
+			Name,
 			"--",
 			"dpkg",
 			"--purge",
@@ -222,7 +222,7 @@ local FROM = function(base, cid, assets)
 			"copy",
 			"--chown",
 			og,
-			name,
+			Name,
 			src,
 			dest,
 		}
@@ -311,7 +311,7 @@ local FROM = function(base, cid, assets)
 				"config",
 				Format("--%s", k),
 				Format([['%s']], v),
-				name,
+				Name,
 			}
 			Buildah(a, "CONFIG", {
 				config = k,
@@ -324,7 +324,7 @@ local FROM = function(base, cid, assets)
 			"config",
 			"--entrypoint",
 			Format([['[\"%s\"]']], entrypoint),
-			name,
+			Name,
 		}
 		Buildah(a, "ENTRYPOINT(exe)", {
 			entrypoint = entrypoint,
@@ -333,7 +333,7 @@ local FROM = function(base, cid, assets)
 			"config",
 			"--cmd",
 			[['']],
-			name,
+			Name,
 		}
 		Buildah(a, "ENTRYPOINT(cmd)", {
 			cmd = [['']],
@@ -342,7 +342,7 @@ local FROM = function(base, cid, assets)
 			"config",
 			"--stop-signal",
 			"TERM",
-			name,
+			Name,
 		}
 		Buildah(a, "ENTRYPOINT(term)", {
 			term = "TERM",
@@ -353,7 +353,7 @@ local FROM = function(base, cid, assets)
 			"commit",
 			"--rm",
 			"--squash",
-			name,
+			Name,
 			Format("oci-archive:%s", cname),
 		}
 		Buildah(a, "ARCHIVE", {
