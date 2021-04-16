@@ -295,7 +295,7 @@ local Sub = string.sub
 local Ok = require("stdout").info
 local Panic = function(msg, tbl)
 	local stderr = require("stderr").error
-	stderr.error(msg, tbl)
+	stderr(msg, tbl)
 	os.exit(1)
 end
 local buildah = exec.ctx("buildah")
