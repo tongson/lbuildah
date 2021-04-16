@@ -35,34 +35,6 @@ local Buildah = function(a, msg, tbl)
 		Ok(msg, tbl)
 	end
 end
-local Mount = function(n)
-	local r, so, se = buildah({
-		"mount",
-		n,
-	})
-	if not r or (so == "/") then
-		Panic("buildah mount", {
-			name = n,
-			stdout = so,
-			stderr = se,
-		})
-	end
-	return so
-end
-local Unmount = function(n)
-	local r, so, se = buildah({
-		"unmount",
-		n,
-	})
-	if not r then
-		Panic("buildah unmount", {
-			name = n,
-			stdout = so,
-			stderr = se,
-		})
-	end
-	return true
-end
 local creds
 do
 	local ruser = os.getenv("BUILDAH_USER")
@@ -72,10 +44,38 @@ end
 local FROM = function(base, cid, assets)
 	assets = assets or fs.currentdir()
 	local name = cid or require("uid").new()
+	local Mount = function()
+		local r, so, se = buildah({
+			"mount",
+			name,
+		})
+		if not r or (so == "/") then
+			Panic("buildah mount", {
+				name = name,
+				stdout = so,
+				stderr = se,
+			})
+		end
+		return so
+	end
+	local Unmount = function()
+		local r, so, se = buildah({
+			"unmount",
+			name,
+		})
+		if not r then
+			Panic("buildah unmount", {
+				name = name,
+				stdout = so,
+				stderr = se,
+			})
+		end
+		return true
+	end
 	local Try = function(fn, args, msg)
 		local tbl = {}
 		local r, so, se = fn(args)
-		Unmount(name)
+		Unmount()
 		if not r then
 			tbl.stdout = so
 			tbl.stderr = se
@@ -84,9 +84,9 @@ local FROM = function(base, cid, assets)
 	end
 	local Epilogue = function()
 		local rm = exec.ctx("rm")
-		rm.cwd = Mount(name)
+		rm.cwd = Mount()
 		local mkdir = exec.ctx("mkdir")
-		mkdir.cwd = Mount(name)
+		mkdir.cwd = Mount()
 		Try(rm, { "-r", "-f", "tmp" })
 		Try(mkdir, { "-m", "017777", "tmp" })
 		Try(rm, { "-r", "-f", "var/tmp" })
@@ -95,7 +95,7 @@ local FROM = function(base, cid, assets)
 		Try(mkdir, { "-m", "0755", "var/log" })
 		Try(rm, { "-r", "-f", "var/cache" })
 		Try(mkdir, { "-m", "0755", "var/cache" })
-		Unmount(name)
+		Unmount()
 	end
 
 	if not cid then
@@ -234,14 +234,14 @@ local FROM = function(base, cid, assets)
 	env.MKDIR = function(d, mode)
 		mode = mode or "0700"
 		local mkdir = exec.ctx("mkdir")
-		mkdir.cwd = Mount(name)
+		mkdir.cwd = Mount()
 		local r, so, se = mkdir({
 			"-m",
 			mode,
 			"-p",
 			Sub(d, 2),
 		})
-		Unmount(name)
+		Unmount()
 		if r then
 			Ok("MKDIR", {
 				directory = d,
@@ -256,12 +256,12 @@ local FROM = function(base, cid, assets)
 	end
 	env.CHMOD = function(mode, p)
 		local chmod = exec.ctx("chmod")
-		chmod.cwd = Mount(name)
+		chmod.cwd = Mount()
 		local r, so, se = chmod({
 			mode,
 			Sub(p, 2),
 		})
-		Unmount(name)
+		Unmount()
 		if r then
 			Ok("CHMOD", {
 				path = p,
@@ -276,7 +276,7 @@ local FROM = function(base, cid, assets)
 	end
 	env.RM = function(f)
 		local rm = exec.ctx("rm")
-		rm.cwd = Mount(name)
+		rm.cwd = Mount()
 		local frm = function(ff)
 			local r, so, se = rm({
 				"-r",
@@ -288,7 +288,7 @@ local FROM = function(base, cid, assets)
 					file = ff,
 				})
 			else
-				Unmount(name)
+				Unmount()
 				Panic("RM", {
 					file = ff,
 					stdout = so,
@@ -303,7 +303,7 @@ local FROM = function(base, cid, assets)
 		else
 			frm(f)
 		end
-		Unmount(name)
+		Unmount()
 	end
 	env.CONFIG = function(config)
 		for k, v in pairs(config) do
@@ -365,21 +365,21 @@ local FROM = function(base, cid, assets)
 		end
 		if a == "perl" then
 			local sh = exec.ctx("sh")
-			sh.cwd = Mount(name)
+			sh.cwd = Mount()
 			for _, v in ipairs(list_perl) do
 				Try(sh, { "-c", Format([[rm -rf -- %s]], v) })
 			end
-			Unmount(name)
+			Unmount()
 			Ok("PURGE(perl)", {})
 		end
 		if a == "userland" then
 		end
 		if a == "docs" or a == "documentation" then
 			local xargs = exec.ctx("xargs")
-			xargs.cwd = Mount(name)
+			xargs.cwd = Mount()
 			xargs.stdin = stdin_docs
 			local r, so, se = xargs({ "rm", "-r", "-f" })
-			Unmount(name)
+			Unmount()
 			if r then
 				Ok("PURGE(docs)", {})
 			else
