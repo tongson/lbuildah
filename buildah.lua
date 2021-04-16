@@ -10,7 +10,6 @@ local panic = function(ret, msg, tbl)
 		os.exit(1)
 	end
 end
-local ID = require("uid").new()
 local USER = os.getenv("USER")
 local HOME = os.getenv("HOME")
 local CREDS
@@ -24,7 +23,7 @@ local from = function(base, cid, assets)
 	local util_buildah = assets .. "/util-buildah.20210415"
 	local buildah = exec.ctx("buildah")
 	buildah.env = { USER = USER, HOME = HOME }
-	local name = cid or ID
+	local name = cid or require("uid").new()
 	if not cid then
 		local r, so, se = buildah({
 			"from",
