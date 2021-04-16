@@ -1,4 +1,202 @@
 -- Requires buildah, skopeo
+local stdin_userland = [[
+bin/sh
+bin/dash
+bin/bash
+bin/cat
+bin/chgrp
+bin/chmod
+bin/chown
+bin/cp
+bin/date
+bin/dd
+bin/df
+bin/dir
+bin/echo
+bin/false
+bin/ln
+bin/ls
+bin/mkdir
+bin/mknod
+bin/mktemp
+bin/mv
+bin/pwd
+bin/readlink
+bin/rm
+bin/rmdir
+bin/sleep
+bin/stty
+bin/sync
+bin/touch
+bin/true
+bin/uname
+bin/vdir
+usr/bin/[
+usr/bin/arch
+usr/bin/b2sum
+usr/bin/base32
+usr/bin/base64
+usr/bin/basename
+usr/bin/chcon
+usr/bin/cksum
+usr/bin/comm
+usr/bin/csplit
+usr/bin/cut
+usr/bin/dircolors
+usr/bin/dirname
+usr/bin/du
+usr/bin/env
+usr/bin/expand
+usr/bin/expr
+usr/bin/factor
+usr/bin/fmt
+usr/bin/fold
+usr/bin/groups
+usr/bin/head
+usr/bin/hostid
+usr/bin/id
+usr/bin/install
+usr/bin/join
+usr/bin/link
+usr/bin/logname
+usr/bin/md5sum
+usr/bin/md5sum.textutils
+usr/bin/mkfifo
+usr/bin/nice
+usr/bin/nl
+usr/bin/nohup
+usr/bin/nproc
+usr/bin/numfmt
+usr/bin/od
+usr/bin/paste
+usr/bin/pathchk
+usr/bin/pinky
+usr/bin/pr
+usr/bin/printenv
+usr/bin/printf
+usr/bin/ptx
+usr/bin/realpath
+usr/bin/runcon
+usr/bin/seq
+usr/bin/sha1sum
+usr/bin/sha224sum
+usr/bin/sha256sum
+usr/bin/sha384sum
+usr/bin/sha512sum
+usr/bin/shred
+usr/bin/shuf
+usr/bin/sort
+usr/bin/split
+usr/bin/stat
+usr/bin/stdbuf
+usr/bin/sum
+usr/bin/tac
+usr/bin/tail
+usr/bin/tee
+usr/bin/test
+usr/bin/timeout
+usr/bin/tr
+usr/bin/truncate
+usr/bin/tsort
+usr/bin/tty
+usr/bin/unexpand
+usr/bin/uniq
+usr/bin/unlink
+usr/bin/users
+usr/bin/wc
+usr/bin/who
+usr/bin/whoami
+usr/bin/yes
+usr/lib/x86_64-linux-gnu/coreutils/libstdbuf.so
+usr/sbin/chroot
+bin/egrep
+bin/fgrep
+bin/grep
+usr/bin/rgrep
+bin/gunzip
+bin/gzexe
+bin/gzip
+bin/uncompress
+bin/zcat
+bin/zcmp
+bin/zdiff
+bin/zegrep
+bin/zfgrep
+bin/zforce
+bin/zgrep
+bin/zless
+bin/zmore
+bin/znew
+sbin/shadowconfig
+usr/bin/chage
+usr/bin/chfn
+usr/bin/chsh
+usr/bin/expiry
+usr/bin/gpasswd
+usr/bin/passwd
+usr/lib/tmpfiles.d/passwd.conf
+usr/sbin/chgpasswd
+usr/sbin/chpasswd
+usr/sbin/cpgr
+usr/sbin/cppw
+usr/sbin/groupadd
+usr/sbin/groupdel
+usr/sbin/groupmems
+usr/sbin/groupmod
+usr/sbin/grpck
+usr/sbin/grpconv
+usr/sbin/grpunconv
+usr/sbin/newusers
+usr/sbin/pwck
+usr/sbin/pwconv
+usr/sbin/pwunconv
+usr/sbin/useradd
+usr/sbin/userdel
+usr/sbin/usermod
+usr/sbin/vigr
+usr/sbin/vipw
+sbin/mkhomedir_helper
+sbin/pam_tally
+sbin/pam_tally2
+sbin/unix_chkpwd
+sbin/unix_update
+usr/sbin/pam_timestamp_check
+usr/sbin/pam-auth-update
+usr/sbin/pam_getenv
+usr/sbin/addgroup
+usr/sbin/adduser
+usr/sbin/delgroup
+usr/sbin/deluser
+usr/share/adduser/adduser.conf
+usr/sbin/update-passwd
+usr/share/base-passwd/group.master
+usr/share/base-passwd/passwd.master
+bin/sed
+usr/bin/find
+usr/bin/xargs
+usr/bin/mawk
+bin/tar
+usr/lib/mime/packages/tar
+usr/sbin/rmt-tar
+usr/sbin/tarcat
+usr/bin/cmp
+usr/bin/diff
+usr/bin/diff3
+usr/bin/sdiff
+sbin/ldconfig
+usr/bin/catchsegv
+usr/bin/getconf
+usr/bin/getent
+usr/bin/iconv
+usr/bin/ldd
+usr/bin/locale
+usr/bin/localedef
+usr/bin/pldd
+usr/bin/tzselect
+usr/bin/zdump
+usr/sbin/iconvconfig
+usr/sbin/zic
+]]
 local stdin_dpkg = [[
 usr/bin/dpkg
 usr/bin/dpkg-deb
@@ -161,14 +359,15 @@ local FROM = function(base, cid, assets)
 		rm.cwd = Mount()
 		local mkdir = exec.ctx("mkdir")
 		mkdir.cwd = Mount()
-		Try(rm, { "-r", "-f", "tmp" })
-		Try(mkdir, { "-m", "017777", "tmp" })
-		Try(rm, { "-r", "-f", "var/tmp" })
-		Try(mkdir, { "-m", "017777", "var/tmp" })
-		Try(rm, { "-r", "-f", "var/log" })
-		Try(mkdir, { "-m", "0755", "var/log" })
-		Try(rm, { "-r", "-f", "var/cache" })
-		Try(mkdir, { "-m", "0755", "var/cache" })
+		local msg = "epilogue"
+		Try(rm, { "-r", "-f", "tmp" }, msg)
+		Try(mkdir, { "-m", "017777", "tmp" }, msg)
+		Try(rm, { "-r", "-f", "var/tmp" }, msg)
+		Try(mkdir, { "-m", "017777", "var/tmp" }, msg)
+		Try(rm, { "-r", "-f", "var/log" }, msg)
+		Try(mkdir, { "-m", "0755", "var/log" }, msg)
+		Try(rm, { "-r", "-f", "var/cache" }, msg)
+		Try(mkdir, { "-m", "0755", "var/cache" }, msg)
 		Unmount()
 	end
 
@@ -434,7 +633,7 @@ local FROM = function(base, cid, assets)
 			name = cname,
 		})
 	end
-	env.PURGE = function(a)
+	env.PURGE = function(a, opts)
 		if a == "debian" or a == "dpkg" then
 			local xargs = exec.ctx("xargs")
 			xargs.cwd = Mount()
@@ -454,12 +653,25 @@ local FROM = function(base, cid, assets)
 			local sh = exec.ctx("sh")
 			sh.cwd = Mount()
 			for _, v in ipairs(list_perl) do
-				Try(sh, { "-c", Format([[rm -rf -- %s]], v) })
+				Try(sh, { "-c", Format([[rm -rf -- %s]], v) }, "PURGE(perl)")
 			end
 			Unmount()
 			Ok("PURGE(perl)", {})
 		end
 		if a == "userland" then
+			local sh = exec.ctx("sh")
+			sh.cwd = Mount()
+			local tbl = stdin_userland:to_map()
+			if opts then
+				for _, f in ipairs(opts) do
+					tbl[f] = nil
+				end
+			end
+			for v in next, tbl do
+				Try(sh, { "-c", Format([[rm -rf -- %s]], v) }, "PURGE(userland)")
+			end
+			Unmount()
+			Ok("PURGE(userland)", {})
 		end
 		if a == "docs" or a == "documentation" then
 			local xargs = exec.ctx("xargs")
@@ -476,8 +688,6 @@ local FROM = function(base, cid, assets)
 				})
 			end
 		end
-		if a == "shell" or a == "sh" then
-		end
 	end
 	setfenv(2, env)
 end
@@ -485,3 +695,4 @@ end
 return {
 	FROM = FROM,
 }
+
