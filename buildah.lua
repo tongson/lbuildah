@@ -333,7 +333,7 @@ local FROM = function(base, cid, assets)
 				stderr = se,
 			})
 		end
-		return so
+		return so:sub(1, -2)
 	end
 	local Unmount = function()
 		local r, so, se = buildah({
