@@ -31,6 +31,34 @@ local Buildah = function(a, msg, tbl)
 		Ok(msg, tbl)
 	end
 end
+local Mount = function(n)
+	local r, so, se = buildah({
+		"mount",
+		n,
+	})
+	if not r or (so == "/") then
+		Panic("buildah mount", {
+			name = n,
+			stdout = so,
+			stderr = se,
+		})
+	end
+	return so
+end
+local Unmount = function(n)
+	local r, so, se = buildah({
+		"unmount",
+		n,
+	})
+	if not r then
+		Panic("buildah unmount", {
+			name = n,
+			stdout = so,
+			stderr = se,
+		})
+	end
+	return true
+end
 local creds
 do
 	local ruser = os.getenv("BUILDAH_USER")
@@ -55,26 +83,6 @@ local FROM = function(base, cid, assets)
 		Ok("Reusing existing container", {
 			name = name,
 		})
-	end
-	local mount
-	do
-		local r, so, se = buildah({
-			"mount",
-			name,
-		})
-		if r and not (so == "/") then
-			Ok("buildah mount", {
-				name = name,
-				mount = so,
-			})
-			mount = so
-		else
-			Panic("buildah mount", {
-				name = name,
-				stdout = so,
-				stderr = se,
-			})
-		end
 	end
 	local env = {}
 	setmetatable(env, {
@@ -196,13 +204,14 @@ local FROM = function(base, cid, assets)
 	env.MKDIR = function(d, mode)
 		mode = mode or "0700"
 		local mkdir = exec.ctx("mkdir")
-		mkdir.cwd = mount
+		mkdir.cwd = Mount(name)
 		local r, so, se = mkdir({
 			"-m",
 			mode,
 			"-p",
 			Sub(d, 2),
 		})
+		Unmount(name)
 		if r then
 			Ok("MKDIR", {
 				directory = d,
@@ -217,11 +226,12 @@ local FROM = function(base, cid, assets)
 	end
 	env.CHMOD = function(mode, p)
 		local chmod = exec.ctx("chmod")
-		chmod.cwd = mount
+		chmod.cwd = Mount(name)
 		local r, so, se = chmod({
 			mode,
 			Sub(p, 2),
 		})
+		Unmount(name)
 		if r then
 			Ok("CHMOD", {
 				path = p,
@@ -236,7 +246,7 @@ local FROM = function(base, cid, assets)
 	end
 	env.RM = function(f)
 		local rm = exec.ctx("rm")
-		rm.cwd = mount
+		rm.cwd = Mount(name)
 		local frm = function(ff)
 			local r, so, se = rm({
 				"-r",
@@ -248,6 +258,7 @@ local FROM = function(base, cid, assets)
 					file = ff,
 				})
 			else
+				Unmount(name)
 				Panic("RM", {
 					file = ff,
 					stdout = so,
@@ -262,6 +273,7 @@ local FROM = function(base, cid, assets)
 		else
 			frm(f)
 		end
+		Unmount(name)
 	end
 	env.CONFIG = function(config)
 		for k, v in pairs(config) do
@@ -329,9 +341,10 @@ local FROM = function(base, cid, assets)
 		end
 		if a == "docs" or a == "documentation" then
 			local xargs = exec.ctx("xargs")
-			xargs.cwd = mount
+			xargs.cwd = Mount(name)
 			xargs.stdin = stdin_docs
 			local r, so, se = xargs({ "rm", "-r", "-f" })
+			Unmount(name)
 			if r then
 				Ok("PURGE(docs)", {})
 			else
