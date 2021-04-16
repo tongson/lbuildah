@@ -181,23 +181,24 @@ local FROM = function(base, cid, assets)
 			destination = dest,
 		})
 	end
-	env.MKDIR = function(d, m)
-		m = m or ""
-		local a = {
-			"run",
-			"--volume",
-			Format("%s:/ub", util_buildah),
-			name,
-			"--",
-			"/ub",
-			"mkdir",
-			d,
-			m,
+	env.MKDIR = function(d)
+		local mkdir = exec.ctx("mkdir")
+		mkdir.cwd = mount
+		local r, so, se = mkdir{
+			"-p",
+			Sub(d, 2),
 		}
-		Buildah(a, "MKDIR", {
-			directory = d,
-			mode = m,
-		})
+		if r then
+			Ok("MKDIR", {
+				directory = d,
+			})
+		else
+			Panic("MKDIR", {
+				directory = d,
+				stdout = so,
+				stderr = se,
+			})
+		end
 	end
 	env.RM = function(f)
 		local rm = exec.ctx("rm")
