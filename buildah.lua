@@ -1,4 +1,78 @@
 -- Requires buildah, skopeo
+local stdin_dpkg = [[
+usr/bin/dpkg
+usr/bin/dpkg-deb
+usr/bin/dpkg-divert
+usr/bin/dpkg-maintscript-helper
+usr/bin/dpkg-query
+usr/bin/dpkg-split
+usr/bin/dpkg-statoverride
+usr/bin/dpkg-trigger
+usr/bin/update-alternatives
+usr/share/dpkg
+etc/dpkg
+usr/lib/dpkg
+usr/bin/apt
+usr/bin/apt-cache
+usr/bin/apt-cdrom
+usr/bin/apt-config
+usr/bin/apt-get
+usr/bin/apt-key
+usr/bin/apt-mark
+usr/lib/apt
+usr/bin/debsig-verify
+sbin/start-stop-daemon
+etc/apt
+usr/bin/deb-systemd-helper
+usr/bin/deb-systemd-invoke
+usr/sbin/invoke-rc.d
+usr/sbin/service
+usr/sbin/update-rc.d
+usr/bin/gpgv
+bin/run-parts
+bin/tempfile
+bin/which
+sbin/installkernel
+usr/bin/ischroot
+usr/bin/savelog
+usr/sbin/add-shell
+usr/sbin/remove-shell
+usr/share/debianutils/shells
+etc/apt/apt.conf.d/01autoremove
+etc/cron.daily/apt-compat
+etc/kernel/postinst.d/apt-auto-removal
+etc/logrotate.d/apt
+lib/systemd/system/apt-daily-upgrade.service
+lib/systemd/system/apt-daily-upgrade.timer
+lib/systemd/system/apt-daily.service
+lib/systemd/system/apt-daily.timer
+usr/bin/apt
+usr/bin/apt-cache
+usr/bin/apt-cdrom
+usr/bin/apt-config
+usr/bin/apt-get
+usr/bin/apt-key
+usr/bin/apt-mark
+usr/lib/apt
+usr/lib/dpkg
+usr/lib/s390x-linux-gnu/libapt-private.so.0.0
+usr/lib/s390x-linux-gnu/libapt-private.so.0.0.0
+usr/share/bash-completion/completions/apt
+etc/debconf.conf
+usr/bin/debconf
+usr/bin/debconf-apt-progress
+usr/bin/debconf-communicate
+usr/bin/debconf-copydb
+usr/bin/debconf-escape
+usr/bin/debconf-set-selections
+usr/bin/debconf-show
+usr/sbin/dpkg-preconfigure
+usr/sbin/dpkg-reconfigure
+usr/share/debconf
+usr/share/perl5/Debconf
+usr/share/perl5/Debian
+usr/share/pixmaps/debian-logo.pngG
+]]
 local stdin_docs = [[
 usr/share/doc
 usr/share/man
@@ -362,6 +436,19 @@ local FROM = function(base, cid, assets)
 	end
 	env.PURGE = function(a)
 		if a == "debian" or a == "dpkg" then
+			local xargs = exec.ctx("xargs")
+			xargs.cwd = Mount()
+			xargs.stdin = stdin_dpkg
+			local r, so, se = xargs({ "rm", "-r", "-f" })
+			Unmount()
+			if r then
+				Ok("PURGE(dpkg)", {})
+			else
+				Panic("PURGE(dpkg)", {
+					stdout = so,
+					stderr = se,
+				})
+			end
 		end
 		if a == "perl" then
 			local sh = exec.ctx("sh")
