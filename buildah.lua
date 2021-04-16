@@ -2,6 +2,7 @@
 local Format = string.format
 local Concat = table.concat
 local Gmatch = string.gmatch
+local Find = string.find
 local Ok = require("stdout").info
 local Panic = require("stderr").error
 local buildah = exec.ctx("buildah")
@@ -49,18 +50,19 @@ local FROM = function(base, cid, assets)
 			"mount",
 			name,
 		})
-		if not r then
+		if r and Find(so, "/var/lib/containers", 1, true) == 1 then
+			Ok("buildah mount", {
+				name = name,
+				mount = so,
+			})
+			mount = so
+		else
 			Panic("buildah mount", {
 				name = name,
 				stdout = so,
 				stderr = se,
 			})
-		else
-			Ok("buildah mount", {
-				name = name,
-			})
 		end
-		mount = so
 	end
 	local env = {}
 	setmetatable(env, {
