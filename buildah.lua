@@ -634,6 +634,20 @@ local FROM = function(base, cid, assets)
 			name = cname,
 		})
 	end
+	env.DIR = function(dirname)
+		Epilogue()
+		local a = {
+			"commit",
+			"--rm",
+			"--squash",
+			Name,
+			Format("dir:%s", dirname),
+		}
+		Buildah(a, "DIR", {
+			name = Name,
+			path = dirname,
+		})
+	end
 	env.PURGE = function(a, opts)
 		if a == "debian" or a == "dpkg" then
 			local xargs = exec.ctx("xargs")
