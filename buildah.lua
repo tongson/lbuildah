@@ -291,7 +291,6 @@ local list_perl = {
 local Format = string.format
 local Concat = table.concat
 local Gmatch = string.gmatch
-local Sub = string.sub
 local Ok = require("stdout").info
 local Panic = function(msg, tbl)
 	local stderr = require("stderr").error
@@ -517,7 +516,7 @@ local FROM = function(base, cid, assets)
 			"-m",
 			mode,
 			"-p",
-			Sub(d, 2),
+			d:sub(2),
 		})
 		Unmount()
 		if r then
@@ -537,7 +536,7 @@ local FROM = function(base, cid, assets)
 		chmod.cwd = Mount()
 		local r, so, se = chmod({
 			mode,
-			Sub(p, 2),
+			p:sub(2),
 		})
 		Unmount()
 		if r then
@@ -559,7 +558,7 @@ local FROM = function(base, cid, assets)
 			local r, so, se = rm({
 				"-r",
 				"-f",
-				Sub(ff, 2),
+				ff:sub(2),
 			})
 			if r then
 				Ok("RM", {
