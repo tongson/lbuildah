@@ -311,7 +311,9 @@ local creds
 do
 	local ruser = os.getenv("BUILDAH_USER")
 	local rpass = os.getenv("BUILDAH_PASSWORD")
-	creds = ruser .. ":" .. rpass
+	if ruser and rpass then
+		creds = ruser .. ":" .. rpass
+	end
 end
 local FROM = function(base, cid, assets)
 	assets = assets or fs.currentdir()
