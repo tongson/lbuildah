@@ -308,73 +308,81 @@ local Buildah = function(a, msg, tbl)
 		Ok(msg, tbl)
 	end
 end
-local creds
+local ENV = {}
+setmetatable(ENV, {
+	__index = function(_, value)
+		return rawget(ENV, value)
+			or rawget(_G, value)
+			or Panic("Unknown command or variable", { string = value })
+	end,
+})
+local Name, Assets
+local Creds
 do
 	local ruser = os.getenv("BUILDAH_USER")
 	local rpass = os.getenv("BUILDAH_PASSWORD")
 	if ruser and rpass then
-		creds = ruser .. ":" .. rpass
+		Creds = ruser .. ":" .. rpass
 	end
 end
-local FROM = function(base, cid, assets)
-	assets = assets or fs.currentdir()
-	local Name = cid or require("uid").new()
-	local Mount = function()
-		local r, so, se = buildah({
-			"mount",
-			Name,
+local Mount = function()
+	local r, so, se = buildah({
+		"mount",
+		Name,
+	})
+	if not r or (so == "/") then
+		Panic("buildah mount", {
+			name = Name,
+			stdout = so,
+			stderr = se,
 		})
-		if not r or (so == "/") then
-			Panic("buildah mount", {
-				name = Name,
-				stdout = so,
-				stderr = se,
-			})
-		end
-		return so:sub(1, -2)
 	end
-	local Unmount = function()
-		local r, so, se = buildah({
-			"unmount",
-			Name,
+	return so:sub(1, -2)
+end
+local Unmount = function()
+	local r, so, se = buildah({
+		"unmount",
+		Name,
+	})
+	if not r then
+		Panic("buildah unmount", {
+			name = Name,
+			stdout = so,
+			stderr = se,
 		})
-		if not r then
-			Panic("buildah unmount", {
-				name = Name,
-				stdout = so,
-				stderr = se,
-			})
-		end
-		return true
 	end
-	local Try = function(fn, args, msg)
-		local tbl = {}
-		local r, so, se = fn(args)
-		if not r then
-			tbl.stdout = so
-			tbl.stderr = se
-			Unmount()
-			Panic(msg, tbl)
-		end
-	end
-	local Epilogue = function()
-		local dir = Mount()
-		local rm = exec.ctx("rm")
-		rm.cwd = dir
-		local mkdir = exec.ctx("mkdir")
-		mkdir.cwd = dir
-		local msg = "epilogue"
-		Try(rm, { "-r", "-f", "tmp" }, msg)
-		Try(mkdir, { "-m", "01777", "tmp" }, msg)
-		Try(rm, { "-r", "-f", "var/tmp" }, msg)
-		Try(mkdir, { "-m", "01777", "var/tmp" }, msg)
-		Try(rm, { "-r", "-f", "var/log" }, msg)
-		Try(mkdir, { "-m", "0755", "var/log" }, msg)
-		Try(rm, { "-r", "-f", "var/cache" }, msg)
-		Try(mkdir, { "-m", "0755", "var/cache" }, msg)
+	return true
+end
+local Try = function(fn, args, msg)
+	local tbl = {}
+	local r, so, se = fn(args)
+	if not r then
+		tbl.stdout = so
+		tbl.stderr = se
 		Unmount()
+		Panic(msg, tbl)
 	end
-
+end
+local Epilogue = function()
+	local dir = Mount()
+	local rm = exec.ctx("rm")
+	rm.cwd = dir
+	local mkdir = exec.ctx("mkdir")
+	mkdir.cwd = dir
+	local msg = "epilogue"
+	Try(rm, { "-r", "-f", "tmp" }, msg)
+	Try(mkdir, { "-m", "01777", "tmp" }, msg)
+	Try(rm, { "-r", "-f", "var/tmp" }, msg)
+	Try(mkdir, { "-m", "01777", "var/tmp" }, msg)
+	Try(rm, { "-r", "-f", "var/log" }, msg)
+	Try(mkdir, { "-m", "0755", "var/log" }, msg)
+	Try(rm, { "-r", "-f", "var/cache" }, msg)
+	Try(mkdir, { "-m", "0755", "var/cache" }, msg)
+	Unmount()
+end
+ENV.FROM = function(base, cid, assets)
+	Assets = assets or fs.currentdir()
+	Name = cid or require("uid").new()
 	if not cid then
 		local a = {
 			"from",
@@ -391,362 +399,350 @@ local FROM = function(base, cid, assets)
 			name = Name,
 		})
 	end
-	local env = {}
-	setmetatable(env, {
-		__index = function(_, value)
-			return rawget(env, value)
-				or rawget(_G, value)
-				or Panic("Unknown command or variable", { string = value })
-		end,
+end
+ENV.ADD = function(src, dest, og)
+	og = og or "root:root"
+	local a = {
+		"add",
+		"--chown",
+		og,
+		Name,
+		src,
+		dest,
+	}
+	Buildah(a, "ADD", {
+		source = src,
+		destination = dest,
 	})
-	env.ADD = function(src, dest, og)
-		og = og or "root:root"
-		local a = {
-			"add",
-			"--chown",
-			og,
-			Name,
-			src,
-			dest,
-		}
-		Buildah(a, "ADD", {
-			source = src,
-			destination = dest,
+end
+ENV.RUN = function(v)
+	local a = {
+		"run",
+		Name,
+		"--",
+	}
+	local run = {}
+	for k in Gmatch(v, "%S+") do
+		run[#run + 1] = k
+		a[#a + 1] = k
+	end
+	Buildah(a, "RUN", {
+		name = Name,
+		command = Concat(run, " "),
+	})
+end
+ENV.SCRIPT = function(s)
+	local a = {
+		"run",
+		"--volume",
+		("%s/%s:/%s"):format(Assets, s, s),
+		Name,
+		"--",
+		"/bin/sh",
+		("/%s"):format(s),
+	}
+	Buildah(a, "SCRIPT", {
+		script = a,
+	})
+end
+ENV.APT_GET = function(v)
+	local a = {
+		"run",
+		Name,
+		"--",
+		"/usr/bin/env",
+		"LC_ALL=C",
+		"DEBIAN_FRONTEND=noninteractive",
+		"apt-get",
+		"-qq",
+		"--no-install-recommends",
+		"-o",
+		"APT::Install-Suggests=0",
+		"-o",
+		"APT::Get::AutomaticRemove=1",
+		"-o",
+		"Dpkg::Use-Pty=0",
+		"-o",
+		[[Dpkg::Options::='--force-confnew']],
+		"-o",
+		[[DPkg::options::='--force-unsafe-io']],
+	}
+	local run = {}
+	for k in Gmatch(v, "%S+") do
+		run[#run + 1] = k
+		a[#a + 1] = k
+	end
+	Buildah(a, "APT_GET", {
+		command = run[1],
+		arg = Concat(run, " ", 2),
+	})
+end
+ENV.APT_PURGE = function(p)
+	local a = {
+		"run",
+		Name,
+		"--",
+		"dpkg",
+		"--purge",
+		"--no-triggers",
+		"--force-remove-essential",
+		"--force-breaks",
+		"--force-unsafe-io",
+		p,
+	}
+	Buildah(a, "APT_PURGE", {
+		package = p,
+	})
+end
+ENV.COPY = function(src, dest, og)
+	og = og or "root:root"
+	local a = {
+		"copy",
+		"--chown",
+		og,
+		Name,
+		src,
+		dest,
+	}
+	Buildah(a, "COPY", {
+		source = src,
+		destination = dest,
+	})
+end
+ENV.MKDIR = function(d, mode)
+	mode = mode or "0700"
+	local mkdir = exec.ctx("mkdir")
+	mkdir.cwd = Mount()
+	local r, so, se = mkdir({
+		"-m",
+		mode,
+		"-p",
+		d:sub(2),
+	})
+	Unmount()
+	if r then
+		Ok("MKDIR", {
+			directory = d,
+		})
+	else
+		Panic("MKDIR", {
+			directory = d,
+			stdout = so,
+			stderr = se,
 		})
 	end
-	env.RUN = function(v)
-		local a = {
-			"run",
-			Name,
-			"--",
-		}
-		local run = {}
-		for k in Gmatch(v, "%S+") do
-			run[#run + 1] = k
-			a[#a + 1] = k
-		end
-		Buildah(a, "RUN", {
-			name = Name,
-			command = Concat(run, " "),
+end
+ENV.CHMOD = function(mode, p)
+	local chmod = exec.ctx("chmod")
+	chmod.cwd = Mount()
+	local r, so, se = chmod({
+		mode,
+		p:sub(2),
+	})
+	Unmount()
+	if r then
+		Ok("CHMOD", {
+			path = p,
+		})
+	else
+		Panic("CHMOD", {
+			path = p,
+			stdout = so,
+			stderr = se,
 		})
 	end
-	env.SCRIPT = function(s)
-		local a = {
-			"run",
-			"--volume",
-			("%s/%s:/%s"):format(assets, s, s),
-			Name,
-			"--",
-			"/bin/sh",
-			("/%s"):format(s),
-		}
-		Buildah(a, "SCRIPT", {
-			script = a,
+end
+ENV.RM = function(f)
+	local rm = exec.ctx("rm")
+	rm.cwd = Mount()
+	local frm = function(ff)
+		local r, so, se = rm({
+			"-r",
+			"-f",
+			ff:sub(2),
 		})
-	end
-	env.APT_GET = function(v)
-		local a = {
-			"run",
-			Name,
-			"--",
-			"/usr/bin/env",
-			"LC_ALL=C",
-			"DEBIAN_FRONTEND=noninteractive",
-			"apt-get",
-			"-qq",
-			"--no-install-recommends",
-			"-o",
-			"APT::Install-Suggests=0",
-			"-o",
-			"APT::Get::AutomaticRemove=1",
-			"-o",
-			"Dpkg::Use-Pty=0",
-			"-o",
-			[[Dpkg::Options::='--force-confnew']],
-			"-o",
-			[[DPkg::options::='--force-unsafe-io']],
-		}
-		local run = {}
-		for k in Gmatch(v, "%S+") do
-			run[#run + 1] = k
-			a[#a + 1] = k
-		end
-		Buildah(a, "APT_GET", {
-			command = run[1],
-			arg = Concat(run, " ", 2),
-		})
-	end
-	env.APT_PURGE = function(p)
-		local a = {
-			"run",
-			Name,
-			"--",
-			"dpkg",
-			"--purge",
-			"--no-triggers",
-			"--force-remove-essential",
-			"--force-breaks",
-			"--force-unsafe-io",
-			p,
-		}
-		Buildah(a, "APT_PURGE", {
-			package = p,
-		})
-	end
-	env.COPY = function(src, dest, og)
-		og = og or "root:root"
-		local a = {
-			"copy",
-			"--chown",
-			og,
-			Name,
-			src,
-			dest,
-		}
-		Buildah(a, "COPY", {
-			source = src,
-			destination = dest,
-		})
-	end
-	env.MKDIR = function(d, mode)
-		mode = mode or "0700"
-		local mkdir = exec.ctx("mkdir")
-		mkdir.cwd = Mount()
-		local r, so, se = mkdir({
-			"-m",
-			mode,
-			"-p",
-			d:sub(2),
-		})
-		Unmount()
 		if r then
-			Ok("MKDIR", {
-				directory = d,
+			Ok("RM", {
+				file = ff,
 			})
 		else
-			Panic("MKDIR", {
-				directory = d,
+			Unmount()
+			Panic("RM", {
+				file = ff,
 				stdout = so,
 				stderr = se,
 			})
 		end
 	end
-	env.CHMOD = function(mode, p)
-		local chmod = exec.ctx("chmod")
-		chmod.cwd = Mount()
-		local r, so, se = chmod({
-			mode,
-			p:sub(2),
-		})
-		Unmount()
-		if r then
-			Ok("CHMOD", {
-				path = p,
-			})
-		else
-			Panic("CHMOD", {
-				path = p,
-				stdout = so,
-				stderr = se,
-			})
+	if type(f) == "table" and next(f) then
+		for _, r in ipairs(f) do
+			frm(r)
 		end
+	else
+		frm(f)
 	end
-	env.RM = function(f)
-		local rm = exec.ctx("rm")
-		rm.cwd = Mount()
-		local frm = function(ff)
-			local r, so, se = rm({
-				"-r",
-				"-f",
-				ff:sub(2),
-			})
-			if r then
-				Ok("RM", {
-					file = ff,
-				})
-			else
-				Unmount()
-				Panic("RM", {
-					file = ff,
-					stdout = so,
-					stderr = se,
-				})
-			end
-		end
-		if type(f) == "table" and next(f) then
-			for _, r in ipairs(f) do
-				frm(r)
-			end
-		else
-			frm(f)
-		end
-		Unmount()
-	end
-	env.CONFIG = function(config)
-		for k, v in pairs(config) do
-			local a = {
-				"config",
-				("--%s"):format(k),
-				([['%s']]):format(v),
-				Name,
-			}
-			Buildah(a, "CONFIG", {
-				config = k,
-				value = v,
-			})
-		end
-	end
-	env.ENTRYPOINT = function(entrypoint)
+	Unmount()
+end
+ENV.CONFIG = function(config)
+	for k, v in pairs(config) do
 		local a = {
 			"config",
-			"--entrypoint",
-			([['[\"%s\"]']]):format(entrypoint),
+			("--%s"):format(k),
+			([['%s']]):format(v),
 			Name,
 		}
-		Buildah(a, "ENTRYPOINT(exe)", {
-			entrypoint = entrypoint,
-		})
-		a = {
-			"config",
-			"--cmd",
-			[['']],
-			Name,
-		}
-		Buildah(a, "ENTRYPOINT(cmd)", {
-			cmd = [['']],
-		})
-		a = {
-			"config",
-			"--stop-signal",
-			"TERM",
-			Name,
-		}
-		Buildah(a, "ENTRYPOINT(term)", {
-			term = "TERM",
+		Buildah(a, "CONFIG", {
+			config = k,
+			value = v,
 		})
 	end
-	env.ARCHIVE = function(cname)
-		Epilogue()
-		local a = {
-			"commit",
-			"--rm",
-			"--squash",
-			Name,
-			("oci-archive:%s"):format(cname),
-		}
-		Buildah(a, "ARCHIVE", {
-			name = Name,
-			archive = cname,
-		})
-	end
-	env.DIR = function(dirname)
-		Epilogue()
-		local a = {
-			"commit",
-			"--rm",
-			"--squash",
-			Name,
-			("dir:%s"):format(dirname),
-		}
-		Buildah(a, "DIR", {
-			name = Name,
-			path = dirname,
-		})
-	end
-	env.TAR = function(filename)
-		local location = "/tmp/" .. Name
-		local script = [[
+end
+ENV.ENTRYPOINT = function(entrypoint)
+	local a = {
+		"config",
+		"--entrypoint",
+		([['[\"%s\"]']]):format(entrypoint),
+		Name,
+	}
+	Buildah(a, "ENTRYPOINT(exe)", {
+		entrypoint = entrypoint,
+	})
+	a = {
+		"config",
+		"--cmd",
+		[['']],
+		Name,
+	}
+	Buildah(a, "ENTRYPOINT(cmd)", {
+		cmd = [['']],
+	})
+	a = {
+		"config",
+		"--stop-signal",
+		"TERM",
+		Name,
+	}
+	Buildah(a, "ENTRYPOINT(term)", {
+		term = "TERM",
+	})
+end
+ENV.ARCHIVE = function(cname)
+	Epilogue()
+	local a = {
+		"commit",
+		"--rm",
+		"--squash",
+		Name,
+		("oci-archive:%s"):format(cname),
+	}
+	Buildah(a, "ARCHIVE", {
+		name = Name,
+		archive = cname,
+	})
+end
+ENV.DIR = function(dirname)
+	Epilogue()
+	local a = {
+		"commit",
+		"--rm",
+		"--squash",
+		Name,
+		("dir:%s"):format(dirname),
+	}
+	Buildah(a, "DIR", {
+		name = Name,
+		path = dirname,
+	})
+end
+ENV.TAR = function(filename)
+	local location = "/tmp/" .. Name
+	local script = [[
 TAR=$(find %s -maxdepth 1 -type f -exec file {} \+ | awk -F\: '/archive/{print $1}')
 mv "${TAR}" "%s"
 rm -rf "%s"
 ]]
-		Epilogue()
-		local a = {
-			"commit",
-			"--rm",
-			"--squash",
-			Name,
-			("dir:%s"):format(location),
-		}
-		Buildah(a, "DIR->TAR", {
-			name = Name,
-			path = location,
+	Epilogue()
+	local a = {
+		"commit",
+		"--rm",
+		"--squash",
+		Name,
+		("dir:%s"):format(location),
+	}
+	Buildah(a, "DIR->TAR", {
+		name = Name,
+		path = location,
+	})
+	local sh = exec.ctx("sh")
+	local r, so, se = sh({
+		"-c",
+		script:format(location, filename, location),
+	})
+	if r then
+		Ok("TAR", {
+			file = filename,
 		})
-		local sh = exec.ctx("sh")
-		local r, so, se = sh({
-			"-c",
-			script:format(location, filename, location),
+	else
+		Panic("TAR", {
+			stdout = so,
+			stderr = se,
 		})
+	end
+end
+ENV.PURGE = function(a, opts)
+	if a == "debian" or a == "dpkg" then
+		local xargs = exec.ctx("xargs")
+		xargs.cwd = Mount()
+		xargs.stdin = stdin_dpkg
+		local r, so, se = xargs({ "rm", "-r", "-f" })
+		Unmount()
 		if r then
-			Ok("TAR", {
-				file = filename,
-			})
+			Ok("PURGE(dpkg)", {})
 		else
-			Panic("TAR", {
+			Panic("PURGE(dpkg)", {
 				stdout = so,
 				stderr = se,
 			})
 		end
 	end
-	env.PURGE = function(a, opts)
-		if a == "debian" or a == "dpkg" then
-			local xargs = exec.ctx("xargs")
-			xargs.cwd = Mount()
-			xargs.stdin = stdin_dpkg
-			local r, so, se = xargs({ "rm", "-r", "-f" })
-			Unmount()
-			if r then
-				Ok("PURGE(dpkg)", {})
-			else
-				Panic("PURGE(dpkg)", {
-					stdout = so,
-					stderr = se,
-				})
+	if a == "perl" then
+		local sh = exec.ctx("sh")
+		sh.cwd = Mount()
+		for _, v in ipairs(list_perl) do
+			Try(sh, { "-c", ([[rm -rf -- %s]]):format(v) }, "PURGE(perl)")
+		end
+		Unmount()
+		Ok("PURGE(perl)", {})
+	end
+	if a == "userland" then
+		local sh = exec.ctx("sh")
+		sh.cwd = Mount()
+		local tbl = stdin_userland:to_map()
+		if opts then
+			for _, f in ipairs(opts) do
+				tbl[f] = nil
 			end
 		end
-		if a == "perl" then
-			local sh = exec.ctx("sh")
-			sh.cwd = Mount()
-			for _, v in ipairs(list_perl) do
-				Try(sh, { "-c", ([[rm -rf -- %s]]):format(v) }, "PURGE(perl)")
-			end
-			Unmount()
-			Ok("PURGE(perl)", {})
+		for v in next, tbl do
+			Try(sh, { "-c", ([[rm -rf -- %s]]):format(v) }, "PURGE(userland)")
 		end
-		if a == "userland" then
-			local sh = exec.ctx("sh")
-			sh.cwd = Mount()
-			local tbl = stdin_userland:to_map()
-			if opts then
-				for _, f in ipairs(opts) do
-					tbl[f] = nil
-				end
-			end
-			for v in next, tbl do
-				Try(sh, { "-c", ([[rm -rf -- %s]]):format(v) }, "PURGE(userland)")
-			end
-			Unmount()
-			Ok("PURGE(userland)", {})
-		end
-		if a == "docs" or a == "documentation" then
-			local xargs = exec.ctx("xargs")
-			xargs.cwd = Mount()
-			xargs.stdin = stdin_docs
-			local r, so, se = xargs({ "rm", "-r", "-f" })
-			Unmount()
-			if r then
-				Ok("PURGE(docs)", {})
-			else
-				Panic("PURGE(docs)", {
-					stdout = so,
-					stderr = se,
-				})
-			end
+		Unmount()
+		Ok("PURGE(userland)", {})
+	end
+	if a == "docs" or a == "documentation" then
+		local xargs = exec.ctx("xargs")
+		xargs.cwd = Mount()
+		xargs.stdin = stdin_docs
+		local r, so, se = xargs({ "rm", "-r", "-f" })
+		Unmount()
+		if r then
+			Ok("PURGE(docs)", {})
+		else
+			Panic("PURGE(docs)", {
+				stdout = so,
+				stderr = se,
+			})
 		end
 	end
-	setfenv(2, env)
 end
-
-return {
-	FROM = FROM,
-}
+setfenv(3, ENV)
