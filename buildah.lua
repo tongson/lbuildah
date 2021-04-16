@@ -10,8 +10,6 @@ local panic = function(ret, msg, tbl)
 		os.exit(1)
 	end
 end
-local USER = os.getenv("USER")
-local HOME = os.getenv("HOME")
 local CREDS
 do
 	local ruser = os.getenv("BUILDAH_USER")
@@ -22,7 +20,7 @@ local from = function(base, cid, assets)
 	assets = assets or fs.currentdir()
 	local util_buildah = assets .. "/util-buildah.20210415"
 	local buildah = exec.ctx("buildah")
-	buildah.env = { USER = USER, HOME = HOME }
+	buildah.env = { USER = os.getenv("USER"), HOME = os.getenv("HOME") }
 	local name = cid or require("uid").new()
 	if not cid then
 		local r, so, se = buildah({
@@ -47,19 +45,19 @@ local from = function(base, cid, assets)
 	end
 	local mount
 	do
-		local r, so, se = buildah{
+		local r, so, se = buildah({
 			"mount",
 			name,
-		}
-    panic(r, "Unable to mount", {
+		})
+		panic(r, "Unable to mount", {
 			name = name,
 			stdout = so,
 			stderr = se,
 		})
-	  ok("Mounted", {
+		ok("Mounted", {
 			name = name,
 		})
-	  mount = so
+		mount = so
 	end
 	local env = {}
 	setmetatable(env, {
