@@ -46,6 +46,22 @@ local from = function(base, cid, assets)
 			name = name,
 		})
 	end
+	local mount
+	do
+		local r, so, se = buildah{
+			"mount",
+			name,
+		}
+    panic(r, "Unable to mount", {
+			name = name,
+			stdout = so,
+			stderr = se,
+		})
+	  ok("Mounted", {
+			name = name,
+		})
+	  mount = so
+	end
 	local env = {}
 	setmetatable(env, {
 		__index = function(_, value)
