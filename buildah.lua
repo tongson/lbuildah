@@ -622,6 +622,7 @@ local FROM = function(base, cid, assets)
 		})
 	end
 	env.ARCHIVE = function(cname)
+		Epilogue()
 		local a = {
 			"commit",
 			"--rm",
