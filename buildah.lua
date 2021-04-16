@@ -13,6 +13,12 @@ end
 local ID = require("uid").new()
 local USER = os.getenv("USER")
 local HOME = os.getenv("HOME")
+local CREDS
+do
+	local ruser = os.getenv("BUILDAH_USER")
+	local rpass = os.getenv("BUILDAH_PASSWORD")
+	CREDS = ruser .. ":" .. rpass
+end
 local from = function(base, cid, assets)
 	assets = assets or fs.currentdir()
 	local util_buildah = assets .. "/util-buildah.20210415"
