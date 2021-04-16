@@ -1,60 +1,55 @@
 -- Requires buildah, skopeo
-local F = string.format
-local C = table.concat
-local G = string.gmatch
-local ok = require("stdout").info
-local stderr = require("stderr")
-local panic = function(ret, msg, tbl)
-	if not ret then
-		stderr.error(msg, tbl)
+local Format = string.format
+local Concat = table.concat
+local Gmatch = string.gmatch
+local Ok = require("stdout").info
+local Panic = require("stderr").error
+local Buildah = function(a, msg, tbl)
+	local buildah = exec.ctx("buildah")
+	buildah.env = { USER = os.getenv("USER"), HOME = os.getenv("HOME") }
+	local r, so, se = buildah(a)
+	if not r then
+		tbl.stdout = so
+		tbl.stderr = se
+		Panic(msg, tbl)
 		os.exit(1)
+	else
+		Ok(msg, tbl)
 	end
 end
-local CREDS
+local creds
 do
 	local ruser = os.getenv("BUILDAH_USER")
 	local rpass = os.getenv("BUILDAH_PASSWORD")
-	CREDS = ruser .. ":" .. rpass
+	creds = ruser .. ":" .. rpass
 end
-local from = function(base, cid, assets)
+local FROM = function(base, cid, assets)
 	assets = assets or fs.currentdir()
 	local util_buildah = assets .. "/util-buildah.20210415"
-	local buildah = exec.ctx("buildah")
-	buildah.env = { USER = os.getenv("USER"), HOME = os.getenv("HOME") }
 	local name = cid or require("uid").new()
 	if not cid then
-		local r, so, se = buildah({
+		local a = {
 			"from",
 			"--name",
 			name,
 			base,
-		})
-		panic(r, "Unable to pull image", {
+		}
+		Buildah(a, "FROM", {
 			image = base,
 			name = name,
-			stdout = so,
-			stderr = se,
-		})
-		ok("Base image pulled", {
-			image = base,
 		})
 	else
-		ok("Reusing existing container", {
+		Ok("Reusing existing container", {
 			name = name,
 		})
 	end
 	local mount
 	do
-		local r, so, se = buildah({
+		local a = {
 			"mount",
 			name,
-		})
-		panic(r, "Unable to mount", {
-			name = name,
-			stdout = so,
-			stderr = se,
-		})
-		ok("Mounted", {
+		}
+		Buildah(a, "buildah mount", {
 			name = name,
 		})
 		mount = so
@@ -64,26 +59,20 @@ local from = function(base, cid, assets)
 		__index = function(_, value)
 			return rawget(env, value)
 				or rawget(_G, value)
-				or panic(nil, "Unknown command or variable", { string = value })
+				or Panic("Unknown command or variable", { string = value })
 		end,
 	})
 	env.ADD = function(src, dest, og)
 		og = og or "root:root"
-		local r, so, se = buildah({
+		local a = {
 			"add",
 			"--chown",
 			og,
 			name,
 			src,
 			dest,
-		})
-		panic(r, "ADD", {
-			source = src,
-			destination = dest,
-			stdout = so,
-			stderr = se,
-		})
-		ok("ADD", {
+		}
+		Buildah(a, "ADD", {
 			source = src,
 			destination = dest,
 		})
@@ -95,37 +84,26 @@ local from = function(base, cid, assets)
 			"--",
 		}
 		local run = {}
-		for k in G(v, "%S+") do
+		for k in Gmatch(v, "%S+") do
 			run[#run + 1] = k
 			a[#a + 1] = k
 		end
-		local r, so, se = buildah(a)
-		panic(r, "RUN", {
+		Buildah(a, "RUN", {
 			id = name,
-			command = C(run, " "),
-			stdout = so,
-			stderr = se,
-		})
-		ok("RUN", {
-			command = C(run, " "),
+			command = Concat(run, " "),
 		})
 	end
-	env.SCRIPT = function(a)
-		local r, so, se = buildah({
+	env.SCRIPT = function(s)
+		local a = {
 			"run",
 			"--volume",
-			F("%s/%s:/%s", assets, a, a),
+			Format("%s/%s:/%s", assets, s, s),
 			name,
 			"--",
 			"/bin/sh",
-			F("/%s", a),
-		})
-		panic(r, "SCRIPT", {
-			script = a,
-			stdout = so,
-			stderr = se,
-		})
-		ok("SCRIPT: Success", {
+			Format("/%s", s),
+		}
+		Buildah(a, "SCRIPT", {
 			script = a,
 		})
 	end
@@ -152,24 +130,17 @@ local from = function(base, cid, assets)
 			[[DPkg::options::='--force-unsafe-io']],
 		}
 		local run = {}
-		for k in G(v, "%S+") do
+		for k in Gmatch(v, "%S+") do
 			run[#run + 1] = k
 			a[#a + 1] = k
 		end
-		local r, so, se = buildah(a)
-		panic(r, "APT_GET", {
+		Buildah(a, "APT_GET", {
 			command = run[1],
-			arg = C(run, " ", 2),
-			stdout = so,
-			stderr = se,
-		})
-		ok("APT_GET", {
-			command = run[1],
-			arg = C(run, " ", 2),
+			arg = Concat(run, " ", 2),
 		})
 	end
-	env.APT_PURGE = function(a)
-		local r, so, se = buildah({
+	env.APT_PURGE = function(p)
+		local a = {
 			"run",
 			name,
 			"--",
@@ -179,80 +150,58 @@ local from = function(base, cid, assets)
 			"--force-remove-essential",
 			"--force-breaks",
 			"--force-unsafe-io",
-			a,
-		})
-		panic(r, "APT_PURGE", {
-			arg = a,
-			stdout = so,
-			stderr = se,
-		})
-		ok("APT_PURGE", {
-			arg = a,
+			p,
+		}
+		Buildah(a, "APT_PURGE", {
+			package = p,
 		})
 	end
 	env.COPY = function(src, dest, og)
 		og = og or "root:root"
-		local r, so, se = buildah({
+		local a = {
 			"copy",
 			"--chown",
 			og,
 			name,
 			src,
 			dest,
-		})
-		panic(r, "COPY", {
-			source = src,
-			destination = dest,
-			stdout = so,
-			stderr = se,
-		})
-		ok("COPY", {
+		}
+		Buildah(a, "COPY", {
 			source = src,
 			destination = dest,
 		})
 	end
 	env.MKDIR = function(d, m)
 		m = m or ""
-		local r, so, se = buildah({
+		local a = {
 			"run",
 			"--volume",
-			F("%s:/ub", util_buildah),
+			Format("%s:/ub", util_buildah),
 			name,
 			"--",
 			"/ub",
 			"mkdir",
 			d,
 			m,
-		})
-		panic(r, "MKDIR", {
-			directory = d,
-			mode = m,
-			stdout = so,
-			stderr = se,
-		})
-		ok("MKDIR", {
+		}
+		Buildah(a, "MKDIR", {
 			directory = d,
 			mode = m,
 		})
 	end
 	env.RM = function(f)
 		local rm = function(ff)
-			local r, so, se = buildah({
+			local a = {
 				"run",
 				"--volume",
-				F("%s:/ub", util_buildah),
+				Format("%s:/ub", util_buildah),
 				name,
 				"--",
 				"/ub",
 				"rm",
 				ff,
-			})
-			panic(r, "RM", {
-				file = ff,
-				stdout = so,
-				stderr = se,
-			})
-			ok("RM", {
+			}
+			Buildah(a, "RM", {
 				file = ff,
 			})
 		end
@@ -266,157 +215,71 @@ local from = function(base, cid, assets)
 	end
 	env.CONFIG = function(config)
 		for k, v in pairs(config) do
-			local r, so, se = buildah({
+			local a = {
 				"config",
-				F("--%s", k),
-				F([['%s']], v),
+				Format("--%s", k),
+				Format([['%s']], v),
 				name,
-			})
-			panic(r, "CONFIG", {
-				config = k,
-				value = v,
-				stdout = so,
-				stderr = se,
-			})
-			ok("CONFIG", {
+			}
+			Buildah(a, "CONFIG", {
 				config = k,
 				value = v,
 			})
 		end
 	end
 	env.ENTRYPOINT = function(entrypoint)
-		local r, so, se = buildah({
+		local a = {
 			"config",
 			"--entrypoint",
-			F([['[\"%s\"]']], entrypoint),
+			Format([['[\"%s\"]']], entrypoint),
 			name,
-		})
-		panic(r, "ENTRYPOINT(exe)", {
-			entrypoint = entrypoint,
-			stdout = so,
-			stderr = se,
-		})
-		ok("ENTRYPOINT(exe)", {
+		}
+		Buildah(a, "ENTRYPOINT(exe)", {
 			entrypoint = entrypoint,
 		})
-		r, so, se = buildah({
+		a = {
 			"config",
 			"--cmd",
 			[['']],
 			name,
-		})
-		panic(r, "ENTRYPOINT(cmd)", {
-			cmd = [['']],
-			stdout = so,
-			stderr = se,
-		})
-		ok("ENTRYPOINT(cmd)", {
+		}
+		Buildah(a, "ENTRYPOINT(cmd)", {
 			cmd = [['']],
 		})
-		r, so, se = buildah({
+		a = {
 			"config",
 			"--stop-signal",
 			"TERM",
 			name,
-		})
-		panic(r, "ENTRYPOINT(term)", {
-			term = "TERM",
-			stdout = so,
-			stderr = se,
-		})
-		ok("ENTRYPOINT(term)", {
+		}
+		Buildah(a, "ENTRYPOINT(term)", {
 			term = "TERM",
 		})
 	end
 	env.ARCHIVE = function(cname)
-		local r, so, se = buildah({
+		local a = {
 			"commit",
 			"--rm",
 			"--squash",
 			name,
-			F("oci-archive:%s", cname),
-		})
-		panic(r, "ARCHIVE", {
-			name = cname,
-			stdout = so,
-			stderr = se,
-		})
-		ok("ARCHIVE", {
+			Format("oci-archive:%s", cname),
+		}
+		Buildah(a, "ARCHIVE", {
 			name = cname,
 		})
 	end
 	env.PURGE = function(a)
 		if a == "directories" then
-			buildah({
-				"run",
-				"--volume",
-				F("%s:/ub", util_buildah),
-				name,
-				"--",
-				"/ub",
-				"purge-directories",
-			})
-			ok("PURGE(directories)", {})
 		end
 		if a == "debian" or a == "dpkg" then
-			buildah({
-				"run",
-				"--volume",
-				F("%s:/ub", util_buildah),
-				name,
-				"--",
-				"/ub",
-				"purge-dpkg",
-			})
-			ok("PURGE(apt/dpkg and dependencies)", {})
 		end
 		if a == "perl" then
-			buildah({
-				"run",
-				"--volume",
-				F("%s:/ub", util_buildah),
-				name,
-				"--",
-				"/ub",
-				"purge-perl",
-			})
-			ok("PURGE(perl)", {})
 		end
 		if a == "userland" then
-			buildah({
-				"run",
-				"--volume",
-				F("%s:/ub", util_buildah),
-				name,
-				"--",
-				"/ub",
-				"purge-userland",
-			})
-			ok("PURGE(perl)", {})
 		end
 		if a == "docs" or a == "documentation" then
-			buildah({
-				"run",
-				"--volume",
-				F("%s:/ub", util_buildah),
-				name,
-				"--",
-				"/ub",
-				"purge-docs",
-			})
-			ok("PURGE(docs)", {})
 		end
 		if a == "shell" or a == "sh" then
-			buildah({
-				"run",
-				"--volume",
-				F("%s:/ub", util_buildah),
-				name,
-				"--",
-				"/ub",
-				"purge-sh",
-			})
-			ok("PURGE(sh)", {})
 		end
 	end
 	setfenv(2, env)
