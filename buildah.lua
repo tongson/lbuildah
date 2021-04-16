@@ -1,4 +1,17 @@
 -- Requires buildah, skopeo
+local stdin_docs = [[
+usr/share/doc
+usr/share/man
+usr/share/menu
+usr/share/groff
+usr/share/info
+usr/share/lintian
+usr/share/linda
+usr/share/bug
+usr/share/locale
+usr/share/bash-completion
+var/cache/man
+]]
 local Format = string.format
 local Concat = table.concat
 local Gmatch = string.gmatch
@@ -26,7 +39,6 @@ do
 end
 local FROM = function(base, cid, assets)
 	assets = assets or fs.currentdir()
-	local util_buildah = assets .. "/util-buildah.20210415"
 	local name = cid or require("uid").new()
 	if not cid then
 		local a = {
@@ -50,7 +62,7 @@ local FROM = function(base, cid, assets)
 			"mount",
 			name,
 		})
-		if r and not(so == "/") then
+		if r and not (so == "/") then
 			Ok("buildah mount", {
 				name = name,
 				mount = so,
@@ -185,12 +197,12 @@ local FROM = function(base, cid, assets)
 		mode = mode or "0700"
 		local mkdir = exec.ctx("mkdir")
 		mkdir.cwd = mount
-		local r, so, se = mkdir{
+		local r, so, se = mkdir({
 			"-m",
 			mode,
 			"-p",
 			Sub(d, 2),
-		}
+		})
 		if r then
 			Ok("MKDIR", {
 				directory = d,
@@ -206,10 +218,10 @@ local FROM = function(base, cid, assets)
 	env.CHMOD = function(mode, p)
 		local chmod = exec.ctx("chmod")
 		chmod.cwd = mount
-		local r, so, se = chmod{
+		local r, so, se = chmod({
 			mode,
 			Sub(p, 2),
-		}
+		})
 		if r then
 			Ok("CHMOD", {
 				path = p,
@@ -226,22 +238,22 @@ local FROM = function(base, cid, assets)
 		local rm = exec.ctx("rm")
 		rm.cwd = mount
 		local frm = function(ff)
-			local r, so, se = rm{
+			local r, so, se = rm({
 				"-r",
 				"-f",
 				Sub(ff, 2),
-			}
+			})
 			if r then
 				Ok("RM", {
 					file = ff,
 				})
-		  else
+			else
 				Panic("RM", {
 					file = ff,
 					stdout = so,
 					stderr = se,
 				})
-		  end
+			end
 		end
 		if type(f) == "table" and next(f) then
 			for _, r in ipairs(f) do
@@ -316,6 +328,18 @@ local FROM = function(base, cid, assets)
 		if a == "userland" then
 		end
 		if a == "docs" or a == "documentation" then
+			local xargs = exec.ctx("xargs")
+			xargs.cwd = mount
+			xargs.stdin = stdin_docs
+			local r, so, se = xargs({ "rm", "-r", "-f" })
+			if r then
+				Ok("PURGE(docs)", {})
+			else
+				Panic("PURGE(docs)", {
+					stdout = so,
+					stderr = se,
+				})
+			end
 		end
 		if a == "shell" or a == "sh" then
 		end
