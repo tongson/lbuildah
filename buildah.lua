@@ -12,21 +12,16 @@ usr/share/locale
 usr/share/bash-completion
 var/cache/man
 ]]
+local list_perl = {
+	"usr/bin/perl*",
+	"usr/lib/*/perl*",
+}
 local Format = string.format
 local Concat = table.concat
 local Gmatch = string.gmatch
 local Sub = string.sub
 local Ok = require("stdout").info
 local Panic = require("stderr").error
-local Try = function(fn, args, msg)
-	local tbl = {}
-	local r, so, se = fn(args)
-	if not r then
-		tbl.stdout = so
-		tbl.stderr = se
-		Panic(msg, tbl)
-	end
-end
 local buildah = exec.ctx("buildah")
 local Buildah = function(a, msg, tbl)
 	buildah.env = { USER = os.getenv("USER"), HOME = os.getenv("HOME") }
@@ -68,21 +63,6 @@ local Unmount = function(n)
 	end
 	return true
 end
-local Epilogue = function(n)
-	local rm = exec.ctx("rm")
-	rm.cwd = Mount(n)
-	local mkdir = exec.ctx("mkdir")
-	mkdir.cwd = Mount(n)
-	Try(rm, { "-r", "-f", "tmp" })
-	Try(mkdir, { "-m", "017777", "tmp" })
-	Try(rm, { "-r", "-f", "var/tmp" })
-	Try(mkdir, { "-m", "017777", "var/tmp" })
-	Try(rm, { "-r", "-f", "var/log" })
-	Try(mkdir, { "-m", "0755", "var/log" })
-	Try(rm, { "-r", "-f", "var/cache" })
-	Try(mkdir, { "-m", "0755", "var/cache" })
-	Unmount(n)
-end
 local creds
 do
 	local ruser = os.getenv("BUILDAH_USER")
@@ -92,6 +72,32 @@ end
 local FROM = function(base, cid, assets)
 	assets = assets or fs.currentdir()
 	local name = cid or require("uid").new()
+	local Try = function(fn, args, msg)
+		local tbl = {}
+		local r, so, se = fn(args)
+		Unmount(name)
+		if not r then
+			tbl.stdout = so
+			tbl.stderr = se
+			Panic(msg, tbl)
+		end
+	end
+	local Epilogue = function()
+		local rm = exec.ctx("rm")
+		rm.cwd = Mount(name)
+		local mkdir = exec.ctx("mkdir")
+		mkdir.cwd = Mount(name)
+		Try(rm, { "-r", "-f", "tmp" })
+		Try(mkdir, { "-m", "017777", "tmp" })
+		Try(rm, { "-r", "-f", "var/tmp" })
+		Try(mkdir, { "-m", "017777", "var/tmp" })
+		Try(rm, { "-r", "-f", "var/log" })
+		Try(mkdir, { "-m", "0755", "var/log" })
+		Try(rm, { "-r", "-f", "var/cache" })
+		Try(mkdir, { "-m", "0755", "var/cache" })
+		Unmount(name)
+	end
+
 	if not cid then
 		local a = {
 			"from",
@@ -358,6 +364,13 @@ local FROM = function(base, cid, assets)
 		if a == "debian" or a == "dpkg" then
 		end
 		if a == "perl" then
+			local sh = exec.ctx("sh")
+			sh.cwd = Mount(name)
+			for _, v in ipairs(list_perl) do
+				Try(sh, { "-c", Format([[rm -rf -- %s]], v) })
+			end
+			Unmount(name)
+			Ok("PURGE(perl)", {})
 		end
 		if a == "userland" then
 		end
