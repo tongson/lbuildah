@@ -352,10 +352,10 @@ local FROM = function(base, cid, assets)
 	local Try = function(fn, args, msg)
 		local tbl = {}
 		local r, so, se = fn(args)
-		Unmount()
 		if not r then
 			tbl.stdout = so
 			tbl.stderr = se
+		  Unmount()
 			Panic(msg, tbl)
 		end
 	end
