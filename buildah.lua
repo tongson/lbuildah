@@ -2,6 +2,7 @@
 local Format = string.format
 local Concat = table.concat
 local Gmatch = string.gmatch
+local Sub = string.sub
 local Ok = require("stdout").info
 local Panic = require("stderr").error
 local buildah = exec.ctx("buildah")
@@ -199,27 +200,32 @@ local FROM = function(base, cid, assets)
 		})
 	end
 	env.RM = function(f)
-		local rm = function(ff)
-			local a = {
-				"run",
-				"--volume",
-				Format("%s:/ub", util_buildah),
-				name,
-				"--",
-				"/ub",
-				"rm",
-				ff,
+		local rm = exec.ctx("rm")
+		rm.cwd = mount
+		local frm = function(ff)
+			local r, so, se = rm{
+				"-r",
+				"-f",
+				Sub(ff, 2),
 			}
-			Buildah(a, "RM", {
-				file = ff,
-			})
+			if r then
+				Ok("RM", {
+					file = ff,
+				})
+		  else
+				Panic("RM", {
+					file = ff,
+					stdout = so,
+					stderr = se,
+				})
+		  end
 		end
 		if type(f) == "table" and next(f) then
 			for _, r in ipairs(f) do
-				rm(r)
+				frm(r)
 			end
 		else
-			rm(f)
+			frm(f)
 		end
 	end
 	env.CONFIG = function(config)
