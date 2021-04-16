@@ -1,4 +1,4 @@
--- Requires buildah, skopeo
+-- Requires buildah, crun
 local stdin_userland = [[
 bin/sh
 bin/dash
