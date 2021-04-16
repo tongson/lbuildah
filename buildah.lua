@@ -200,6 +200,25 @@ local FROM = function(base, cid, assets)
 			})
 		end
 	end
+	env.CHMOD = function(mode, p)
+		local chmod = exec.ctx("chmod")
+		chmod.cwd = mount
+		local r, so, se = chmod{
+			mode,
+			Sub(p, 2),
+		}
+		if r then
+			Ok("CHMOD", {
+				path = p,
+			})
+		else
+			Panic("CHMOD", {
+				path = p,
+				stdout = so,
+				stderr = se,
+			})
+		end
+	end
 	env.RM = function(f)
 		local rm = exec.ctx("rm")
 		rm.cwd = mount
