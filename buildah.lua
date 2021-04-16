@@ -181,10 +181,13 @@ local FROM = function(base, cid, assets)
 			destination = dest,
 		})
 	end
-	env.MKDIR = function(d)
+	env.MKDIR = function(d, mode)
+		mode = mode or "0700"
 		local mkdir = exec.ctx("mkdir")
 		mkdir.cwd = mount
 		local r, so, se = mkdir{
+			"-m",
+			mode,
 			"-p",
 			Sub(d, 2),
 		}
