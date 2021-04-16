@@ -288,7 +288,6 @@ local list_perl = {
 	"usr/bin/perl*",
 	"usr/lib/*/perl*",
 }
-local Format = string.format
 local Concat = table.concat
 local Gmatch = string.gmatch
 local Ok = require("stdout").info
@@ -435,11 +434,11 @@ local FROM = function(base, cid, assets)
 		local a = {
 			"run",
 			"--volume",
-			Format("%s/%s:/%s", assets, s, s),
+			("%s/%s:/%s"):format(assets, s, s),
 			Name,
 			"--",
 			"/bin/sh",
-			Format("/%s", s),
+			("/%s"):format(s),
 		}
 		Buildah(a, "SCRIPT", {
 			script = a,
@@ -587,8 +586,8 @@ local FROM = function(base, cid, assets)
 		for k, v in pairs(config) do
 			local a = {
 				"config",
-				Format("--%s", k),
-				Format([['%s']], v),
+				("--%s"):format(k),
+				([['%s']]):format(v),
 				Name,
 			}
 			Buildah(a, "CONFIG", {
@@ -601,7 +600,7 @@ local FROM = function(base, cid, assets)
 		local a = {
 			"config",
 			"--entrypoint",
-			Format([['[\"%s\"]']], entrypoint),
+			([['[\"%s\"]']]):format(entrypoint),
 			Name,
 		}
 		Buildah(a, "ENTRYPOINT(exe)", {
@@ -633,7 +632,7 @@ local FROM = function(base, cid, assets)
 			"--rm",
 			"--squash",
 			Name,
-			Format("oci-archive:%s", cname),
+			("oci-archive:%s"):format(cname),
 		}
 		Buildah(a, "ARCHIVE", {
 			name = Name,
@@ -647,7 +646,7 @@ local FROM = function(base, cid, assets)
 			"--rm",
 			"--squash",
 			Name,
-			Format("dir:%s", dirname),
+			("dir:%s"):format(dirname),
 		}
 		Buildah(a, "DIR", {
 			name = Name,
@@ -667,7 +666,7 @@ rm -rf "%s"
 			"--rm",
 			"--squash",
 			Name,
-			Format("dir:%s", location),
+			("dir:%s"):format(location),
 		}
 		Buildah(a, "DIR->TAR", {
 			name = Name,
@@ -676,7 +675,7 @@ rm -rf "%s"
 		local sh = exec.ctx("sh")
 		local r, so, se = sh({
 			"-c",
-			Format(script, location, filename, location),
+			script:format(location, filename, location),
 		})
 		if r then
 			Ok("TAR", {
@@ -709,7 +708,7 @@ rm -rf "%s"
 			local sh = exec.ctx("sh")
 			sh.cwd = Mount()
 			for _, v in ipairs(list_perl) do
-				Try(sh, { "-c", Format([[rm -rf -- %s]], v) }, "PURGE(perl)")
+				Try(sh, { "-c", ([[rm -rf -- %s]]):format(v) }, "PURGE(perl)")
 			end
 			Unmount()
 			Ok("PURGE(perl)", {})
@@ -724,7 +723,7 @@ rm -rf "%s"
 				end
 			end
 			for v in next, tbl do
-				Try(sh, { "-c", Format([[rm -rf -- %s]], v) }, "PURGE(userland)")
+				Try(sh, { "-c", ([[rm -rf -- %s]]):format(v) }, "PURGE(userland)")
 			end
 			Unmount()
 			Ok("PURGE(userland)", {})
