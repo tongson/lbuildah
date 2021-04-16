@@ -18,6 +18,15 @@ local Gmatch = string.gmatch
 local Sub = string.sub
 local Ok = require("stdout").info
 local Panic = require("stderr").error
+local Try = function(fn, args, msg)
+	local tbl = {}
+	local r, so, se = fn(args)
+	if not r then
+		tbl.stdout = so
+		tbl.stderr = se
+		Panic(msg, tbl)
+	end
+end
 local buildah = exec.ctx("buildah")
 local Buildah = function(a, msg, tbl)
 	buildah.env = { USER = os.getenv("USER"), HOME = os.getenv("HOME") }
@@ -58,6 +67,20 @@ local Unmount = function(n)
 		})
 	end
 	return true
+end
+local Epilogue = function()
+	local rm = exec.ctx("rm")
+	rm.cwd = Mount(name)
+	local mkdir = exec.ctx("mkdir")
+	mkdir.cwd = Mount(name)
+	Try(rm, { "-r", "-f", "tmp" })
+	Try(mkdir, { "-m", "017777", "tmp" })
+	Try(rm, { "-r", "-f", "var/tmp" })
+	Try(mkdir, { "-m", "017777", "var/tmp" })
+	Try(rm, { "-r", "-f", "var/log" })
+	Try(mkdir, { "-m", "0755", "var/log" })
+	Try(rm, { "-r", "-f", "var/cache" })
+	Try(mkdir, { "-m", "0755", "var/cache" })
 end
 local creds
 do
@@ -331,8 +354,6 @@ local FROM = function(base, cid, assets)
 		})
 	end
 	env.PURGE = function(a)
-		if a == "directories" then
-		end
 		if a == "debian" or a == "dpkg" then
 		end
 		if a == "perl" then
