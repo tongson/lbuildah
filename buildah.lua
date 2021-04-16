@@ -355,7 +355,7 @@ local FROM = function(base, cid, assets)
 		if not r then
 			tbl.stdout = so
 			tbl.stderr = se
-		  Unmount()
+			Unmount()
 			Panic(msg, tbl)
 		end
 	end
@@ -654,6 +654,41 @@ local FROM = function(base, cid, assets)
 			path = dirname,
 		})
 	end
+	env.TAR = function(filename)
+		local location = "/tmp/" .. Name
+		local script = [[
+TAR=$(find %s -maxdepth 1 -type f -exec file {} \+ | awk -F\: '/archive/{print $1}')
+mv "${TAR}" "%s"
+rm -rf "%s"
+]]
+		Epilogue()
+		local a = {
+			"commit",
+			"--rm",
+			"--squash",
+			Name,
+			Format("dir:%s", location),
+		}
+		Buildah(a, "DIR->TAR", {
+			name = Name,
+			path = location,
+		})
+		local sh = exec.ctx("sh")
+		local r, so, se = sh({
+			"-c",
+			Format(script, location, filename, location),
+		})
+		if r then
+			Ok("TAR", {
+				file = filename,
+			})
+		else
+			Panic("TAR", {
+				stdout = so,
+				stderr = se,
+			})
+		end
+	end
 	env.PURGE = function(a, opts)
 		if a == "debian" or a == "dpkg" then
 			local xargs = exec.ctx("xargs")
@@ -716,4 +751,3 @@ end
 return {
 	FROM = FROM,
 }
-
