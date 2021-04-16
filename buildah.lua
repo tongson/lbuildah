@@ -359,10 +359,11 @@ local FROM = function(base, cid, assets)
 		end
 	end
 	local Epilogue = function()
+		local dir = Mount()
 		local rm = exec.ctx("rm")
-		rm.cwd = Mount()
+		rm.cwd = dir
 		local mkdir = exec.ctx("mkdir")
-		mkdir.cwd = Mount()
+		mkdir.cwd = dir
 		local msg = "epilogue"
 		Try(rm, { "-r", "-f", "tmp" }, msg)
 		Try(mkdir, { "-m", "01777", "tmp" }, msg)
