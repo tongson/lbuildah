@@ -4,8 +4,8 @@ local Concat = table.concat
 local Gmatch = string.gmatch
 local Ok = require("stdout").info
 local Panic = require("stderr").error
+local buildah = exec.ctx("buildah")
 local Buildah = function(a, msg, tbl)
-	local buildah = exec.ctx("buildah")
 	buildah.env = { USER = os.getenv("USER"), HOME = os.getenv("HOME") }
 	local r, so, se = buildah(a)
 	if not r then
@@ -45,13 +45,21 @@ local FROM = function(base, cid, assets)
 	end
 	local mount
 	do
-		local a = {
+		local r, so, se = buildah({
 			"mount",
 			name,
-		}
-		Buildah(a, "buildah mount", {
-			name = name,
 		})
+		if not r then
+			Panic("buildah mount", {
+				name = name,
+				stdout = so,
+				stderr = se,
+			})
+		else
+			Ok("buildah mount", {
+				name = name,
+			})
+		end
 		mount = so
 	end
 	local env = {}
@@ -286,5 +294,5 @@ local FROM = function(base, cid, assets)
 end
 
 return {
-	from = from,
+	FROM = FROM,
 }
