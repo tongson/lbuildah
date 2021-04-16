@@ -68,11 +68,11 @@ local Unmount = function(n)
 	end
 	return true
 end
-local Epilogue = function()
+local Epilogue = function(n)
 	local rm = exec.ctx("rm")
-	rm.cwd = Mount(name)
+	rm.cwd = Mount(n)
 	local mkdir = exec.ctx("mkdir")
-	mkdir.cwd = Mount(name)
+	mkdir.cwd = Mount(n)
 	Try(rm, { "-r", "-f", "tmp" })
 	Try(mkdir, { "-m", "017777", "tmp" })
 	Try(rm, { "-r", "-f", "var/tmp" })
@@ -81,6 +81,7 @@ local Epilogue = function()
 	Try(mkdir, { "-m", "0755", "var/log" })
 	Try(rm, { "-r", "-f", "var/cache" })
 	Try(mkdir, { "-m", "0755", "var/cache" })
+	Unmount(n)
 end
 local creds
 do
