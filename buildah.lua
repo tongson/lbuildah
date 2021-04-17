@@ -859,7 +859,7 @@ ENV.MKDIR = function(d, mode)
 		"-m",
 		mode,
 		"-p",
-		d:sub(2),
+		Trim(d),
 	})
 	Unmount()
 	if r then
@@ -879,7 +879,7 @@ ENV.CHMOD = function(mode, p)
 	chmod.cwd = Mount()
 	local r, so, se = chmod({
 		mode,
-		p:sub(2),
+		Trim(p)
 	})
 	Unmount()
 	if r then
