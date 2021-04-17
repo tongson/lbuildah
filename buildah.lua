@@ -498,6 +498,13 @@ local list_perl = {
 	"usr/bin/perl*",
 	"usr/lib/*/perl*",
 }
+local list_apk = {
+	"etc/apk",
+	"lib/apk",
+	"lib/libapk*",
+	"usr/share/apk",
+	"var/lib/apk",
+}
 local Concat = table.concat
 local Gmatch = string.gmatch
 local Ok = require("stdout").info
@@ -923,6 +930,15 @@ ENV.PURGE = function(a, opts)
 		end
 		Unmount()
 		Ok("PURGE(perl)", {})
+	end
+	if a == "apk" a == "apk-tools" then
+		local sh = exec.ctx("sh")
+		sh.cwd = Mount()
+		for _, v in ipairs(list_apk) do
+			Try(sh, { "-c", ([[rm -rf -- %s]]):format(v) }, "PURGE(apk-tools)")
+		end
+		Unmount()
+		Ok("PURGE(apk-tools)", {})
 	end
 	if a == "userland" then
 		local sh = exec.ctx("sh")
