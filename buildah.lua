@@ -653,9 +653,7 @@ end
 local ENV = {}
 setmetatable(ENV, {
 	__index = function(_, value)
-		return rawget(ENV, value)
-			or rawget(_G, value)
-			or Panic("Unknown command or variable", { string = value })
+		return rawget(_G, value) or Panic("Unknown command or variable", { string = value })
 	end,
 })
 local Name, Assets
@@ -879,7 +877,7 @@ ENV.CHMOD = function(mode, p)
 	chmod.cwd = Mount()
 	local r, so, se = chmod({
 		mode,
-		Trim(p)
+		Trim(p),
 	})
 	Unmount()
 	if r then
