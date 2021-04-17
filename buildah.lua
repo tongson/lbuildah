@@ -639,7 +639,15 @@ local Trim = function(s)
 	return sub(s, n)
 end
 local buildah = exec.ctx("buildah")
-local Buildah = function(a, msg, tbl)
+local Buildah = function(a, msg, tbl, args)
+	if args then
+		local t = {}
+		for k in Gmatch(args, "%S+") do
+			a[#a + 1] = k
+			t[#t + 1] = k
+		end
+		tbl.args = Concat(t, " ")
+	end
 	buildah.env = { USER = os.getenv("USER"), HOME = os.getenv("HOME") }
 	local r, so, se = buildah(a)
 	if not r then
@@ -761,15 +769,7 @@ ENV.RUN = function(v)
 		Name,
 		"--",
 	}
-	local run = {}
-	for k in Gmatch(v, "%S+") do
-		run[#run + 1] = k
-		a[#a + 1] = k
-	end
-	Buildah(a, "RUN", {
-		name = Name,
-		command = Concat(run, " "),
-	})
+	Buildah(a, "RUN", {}, v)
 end
 ENV.SCRIPT = function(s)
 	local a = {
@@ -807,15 +807,7 @@ ENV.APT_GET = function(v)
 		"-o",
 		[[DPkg::options::='--force-unsafe-io']],
 	}
-	local run = {}
-	for k in Gmatch(v, "%S+") do
-		run[#run + 1] = k
-		a[#a + 1] = k
-	end
-	Buildah(a, "APT_GET", {
-		command = run[1],
-		arg = Concat(run, " ", 2),
-	})
+	Buildah(a, "APT_GET", {}, v)
 end
 ENV.APT_PURGE = function(p)
 	local a = {
@@ -846,6 +838,17 @@ ENV.APK_UPGRADE = function()
 		"--no-progress",
 	}
 	Buildah(a, "APK_UPGRADE", {})
+end
+ENV.APK_ADD = function(v)
+	local a = {
+		"run",
+		Name,
+		"--",
+		"/sbin/apk",
+		"add",
+		"--no-cache",
+	}
+	Buildah(a, "APK_ADD", {}, v)
 end
 ENV.COPY = function(src, dest, og)
 	og = og or "root:root"
