@@ -516,6 +516,7 @@ local list_perl = {
 	"usr/lib/*/perl*",
 }
 local list_apk = {
+	"sbin/apk",
 	"etc/apk",
 	"lib/apk",
 	"lib/libapk*",
