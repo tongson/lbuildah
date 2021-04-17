@@ -245,7 +245,6 @@ bin/usleep
 bin/watch
 sbin/acpid
 sbin/adjtimex
-sbin/apk
 sbin/arp
 sbin/blkid
 sbin/blockdev
