@@ -406,6 +406,23 @@ usr/sbin/rfkill
 usr/sbin/sendmail
 usr/sbin/setfont
 usr/sbin/setlogcons
+etc/logrotate.d
+etc/logrotate.d/acpid
+etc/modprobe.d
+etc/modprobe.d/aliases.conf
+etc/modprobe.d/blacklist.conf
+etc/modprobe.d/i386.conf
+etc/modprobe.d/kms.conf
+etc/modules
+etc/modules-load.d
+etc/network/if-down.d
+etc/network/if-post-down.d
+etc/network/if-post-up.d
+etc/network/if-pre-down.d
+etc/network/if-pre-up.d
+etc/network/if-up.d
+etc/periodic
+lib/firmware
 ]]
 local stdin_dpkg = [[
 usr/bin/dpkg
