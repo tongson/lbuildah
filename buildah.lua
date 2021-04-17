@@ -885,13 +885,23 @@ ENV.CHMOD = function(mode, p)
 	end
 end
 ENV.RM = function(f)
+	local trim_slash = function(s)
+		local sub = string.sub
+		local n = 1
+		local c = sub(s, n, n)
+		while c == "/" do
+			n = n + 1
+			c = sub(s, n, n)
+		end
+		return sub(s, n)
+	end
 	local rm = exec.ctx("rm")
 	rm.cwd = Mount()
 	local frm = function(ff)
 		local r, so, se = rm({
 			"-r",
 			"-f",
-			ff:sub(2),
+			trim_slash(ff),
 		})
 		if r then
 			Ok("RM", {
