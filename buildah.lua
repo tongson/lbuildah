@@ -931,7 +931,7 @@ ENV.PURGE = function(a, opts)
 		Unmount()
 		Ok("PURGE(perl)", {})
 	end
-	if a == "apk" a == "apk-tools" then
+	if a == "apk" or a == "apk-tools" then
 		local sh = exec.ctx("sh")
 		sh.cwd = Mount()
 		for _, v in ipairs(list_apk) do
