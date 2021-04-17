@@ -525,6 +525,7 @@ usr/share/dpkg
 etc/dpkg
 usr/lib/dpkg
 var/lib/dpkg
+var/lib/apt
 usr/bin/apt
 usr/bin/apt-cache
 usr/bin/apt-cdrom
