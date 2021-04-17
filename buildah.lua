@@ -980,6 +980,22 @@ ENV.ARCHIVE = function(cname)
 		archive = cname,
 	})
 end
+ENV.COMMIT = function(cname, tag)
+	tag = tag or Name
+	Epilogue()
+	local a = {
+		"commit",
+		"--rm",
+		"--squash",
+		Name,
+		("containers-storage:%s:%s"):format(cname, tag),
+	}
+	Buildah(a, "COMMIT", {
+		name = Name,
+		container = cname,
+		tag = tag,
+	})
+end
 ENV.DIR = function(dirname)
 	Epilogue()
 	local a = {
