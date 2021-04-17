@@ -468,6 +468,7 @@ usr/sbin/rfkill
 usr/sbin/sendmail
 usr/sbin/setfont
 usr/sbin/setlogcons
+etc/alternatives
 etc/logrotate.d
 etc/logrotate.d/acpid
 etc/modprobe.d
@@ -492,6 +493,7 @@ etc/sysctl.d
 etc/crontabs
 lib/sysctl.d
 lib/modules-load.d
+var/lib/systemd
 usr/share/doc
 usr/share/man
 usr/share/menu
