@@ -496,10 +496,15 @@ lib/modules-load.d
 var/lib/systemd
 etc/systemd
 lib/systemd
+usr/share/gcc-8
+lib/udev
+etc/selinux
+usr/lib/x86_64-linux-gnu/audit
 usr/share/polkit-1
 etc/cron.daily
 usr/share/common-licenses
 usr/share/doc
+usr/share/doc-base
 usr/share/man
 usr/share/menu
 usr/share/groff
@@ -522,6 +527,7 @@ usr/bin/dpkg-statoverride
 usr/bin/dpkg-trigger
 usr/bin/update-alternatives
 usr/share/dpkg
+usr/share/keyrings
 etc/dpkg
 usr/lib/dpkg
 var/lib/dpkg
@@ -590,6 +596,7 @@ usr/share/pixmaps/debian-logo.pngG
 local stdin_docs = [[
 usr/share/common-licenses
 usr/share/doc
+usr/share/doc-base
 usr/share/man
 usr/share/menu
 usr/share/groff
