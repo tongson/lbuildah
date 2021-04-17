@@ -495,8 +495,10 @@ lib/sysctl.d
 lib/modules-load.d
 var/lib/systemd
 etc/systemd
+lib/systemd
 usr/share/polkit-1
 etc/cron.daily
+usr/share/common-licenses
 usr/share/doc
 usr/share/man
 usr/share/menu
@@ -585,6 +587,7 @@ usr/share/perl5/Debian
 usr/share/pixmaps/debian-logo.pngG
 ]]
 local stdin_docs = [[
+usr/share/common-licenses
 usr/share/doc
 usr/share/man
 usr/share/menu
