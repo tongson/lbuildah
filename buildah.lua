@@ -628,6 +628,16 @@ local Panic = function(msg, tbl)
 	stderr(msg, tbl)
 	os.exit(1)
 end
+local Trim = function(s)
+	local sub = string.sub
+	local n = 1
+	local c = sub(s, n, n)
+	while c == "/" do
+		n = n + 1
+		c = sub(s, n, n)
+	end
+	return sub(s, n)
+end
 local buildah = exec.ctx("buildah")
 local Buildah = function(a, msg, tbl)
 	buildah.env = { USER = os.getenv("USER"), HOME = os.getenv("HOME") }
@@ -885,23 +895,13 @@ ENV.CHMOD = function(mode, p)
 	end
 end
 ENV.RM = function(f)
-	local trim_slash = function(s)
-		local sub = string.sub
-		local n = 1
-		local c = sub(s, n, n)
-		while c == "/" do
-			n = n + 1
-			c = sub(s, n, n)
-		end
-		return sub(s, n)
-	end
 	local rm = exec.ctx("rm")
 	rm.cwd = Mount()
 	local frm = function(ff)
 		local r, so, se = rm({
 			"-r",
 			"-f",
-			trim_slash(ff),
+			Trim(ff),
 		})
 		if r then
 			Ok("RM", {
