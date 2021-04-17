@@ -494,6 +494,7 @@ etc/crontabs
 lib/sysctl.d
 lib/modules-load.d
 var/lib/systemd
+etc/systemd
 usr/share/doc
 usr/share/man
 usr/share/menu
