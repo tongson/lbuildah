@@ -834,6 +834,19 @@ ENV.APT_PURGE = function(p)
 		package = p,
 	})
 end
+ENV.APK_UPGRADE = function()
+	local a = {
+		"run",
+		Name,
+		"--",
+		"/sbin/apk",
+		"upgrade",
+		"--no-cache",
+		"--available",
+		"--no-progress",
+	}
+	Buildah(a, "APK_UPGRADE", {})
+end
 ENV.COPY = function(src, dest, og)
 	og = og or "root:root"
 	local a = {
