@@ -495,6 +495,8 @@ lib/sysctl.d
 lib/modules-load.d
 var/lib/systemd
 etc/systemd
+usr/share/polkit-1
+etc/cron.daily
 usr/share/doc
 usr/share/man
 usr/share/menu
@@ -520,6 +522,7 @@ usr/bin/update-alternatives
 usr/share/dpkg
 etc/dpkg
 usr/lib/dpkg
+var/lib/dpkg
 usr/bin/apt
 usr/bin/apt-cache
 usr/bin/apt-cdrom
