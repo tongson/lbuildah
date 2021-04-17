@@ -423,6 +423,18 @@ etc/network/if-pre-up.d
 etc/network/if-up.d
 etc/periodic
 lib/firmware
+media
+usr/share/doc
+usr/share/man
+usr/share/menu
+usr/share/groff
+usr/share/info
+usr/share/lintian
+usr/share/linda
+usr/share/bug
+usr/share/locale
+usr/share/bash-completion
+var/cache/man
 ]]
 local stdin_dpkg = [[
 usr/bin/dpkg
@@ -497,19 +509,6 @@ usr/share/debconf
 usr/share/perl5/Debconf
 usr/share/perl5/Debian
 usr/share/pixmaps/debian-logo.pngG
-]]
-local stdin_docs = [[
-usr/share/doc
-usr/share/man
-usr/share/menu
-usr/share/groff
-usr/share/info
-usr/share/lintian
-usr/share/linda
-usr/share/bug
-usr/share/locale
-usr/share/bash-completion
-var/cache/man
 ]]
 local list_perl = {
 	"usr/bin/perl*",
@@ -972,21 +971,6 @@ ENV.PURGE = function(a, opts)
 		end
 		Unmount()
 		Ok("PURGE(userland)", {})
-	end
-	if a == "docs" or a == "documentation" then
-		local xargs = exec.ctx("xargs")
-		xargs.cwd = Mount()
-		xargs.stdin = stdin_docs
-		local r, so, se = xargs({ "rm", "-r", "-f" })
-		Unmount()
-		if r then
-			Ok("PURGE(docs)", {})
-		else
-			Panic("PURGE(docs)", {
-				stdout = so,
-				stderr = se,
-			})
-		end
 	end
 end
 setfenv(3, ENV)
