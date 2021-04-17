@@ -424,6 +424,12 @@ etc/network/if-up.d
 etc/periodic
 lib/firmware
 media
+usr/lib/modules-load.d
+etc/sysctl.conf
+etc/sysctl.d
+etc/crontabs
+lib/sysctl.d
+lib/modules-load.d
 usr/share/doc
 usr/share/man
 usr/share/menu
