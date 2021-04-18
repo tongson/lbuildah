@@ -706,7 +706,6 @@ local Unmount = function()
 			stderr = se,
 		})
 	end
-	return true
 end
 local Try = function(fn, args, msg)
 	local tbl = {}
