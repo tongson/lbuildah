@@ -734,6 +734,7 @@ local Epilogue = function()
 	Try(mkdir, { "-m", "0755", "var/cache" }, msg)
 	Unmount()
 end
+local Json = require("json")
 ENV.FROM = function(base, cid, assets)
 	Assets = assets or fs.currentdir()
 	Name = cid or require("uid").new()
@@ -971,13 +972,14 @@ ENV.CONFIG = function(config)
 		B()
 	end
 end
-ENV.ENTRYPOINT = function(entrypoint)
+ENV.ENTRYPOINT = function(...)
+	local entrypoint = Json.encode({...})
 	do
 		local B = Buildah("ENTRYPOINT(exe)")
 		B.cmd = {
 			"config",
 			"--entrypoint",
-			([['[\"%s\"]']]):format(entrypoint),
+			([[%s]]):format(entrypoint),
 			Name,
 		}
 		B.log = {
