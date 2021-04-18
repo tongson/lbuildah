@@ -784,18 +784,29 @@ ENV.RUN = function(v)
 	B(v)
 end
 ENV.SCRIPT = function(s)
-	local B = Buildah("SCRIPT")
-	B.cmd = {
-		"run",
-		"--volume",
-		("%s/%s:/%s"):format(Assets, s, s),
-		Name,
-		"--",
-		"/bin/sh",
-		("/%s"):format(s),
-	}
-	B.log = { script = s }
-	B()
+	local script = [[chroot %s /bin/sh <<-"__58jvnv82_04fimmv"
+%s
+__58jvnv82_04fimmv
+]]
+	local str = fs.read(Assets .. "/" .. s)
+	local cwd = Mount()
+	local sh = exec.ctx("sh")
+	local r, so, se, err = sh({
+		"-c",
+		script:format(cwd, str),
+	})
+	Unmount()
+	if r then
+		Ok("SCRIPT", {
+			script = s,
+		})
+	else
+		Panic("SCRIPT", {
+			stdout = so,
+			stderr = se,
+			error = err,
+		})
+	end
 end
 ENV.APT_GET = function(v)
 	local B = Buildah("APT_GET")
@@ -973,7 +984,7 @@ ENV.CONFIG = function(config)
 	end
 end
 ENV.ENTRYPOINT = function(...)
-	local entrypoint = Json.encode({...})
+	local entrypoint = Json.encode({ ... })
 	do
 		local B = Buildah("ENTRYPOINT(exe)")
 		B.cmd = {
