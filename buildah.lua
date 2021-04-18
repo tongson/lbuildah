@@ -1029,8 +1029,7 @@ ENV.ARCHIVE = function(cname)
 	}
 	B()
 end
-ENV.COMMIT = function(cname, tag)
-	tag = tag or Name
+ENV.COMMIT = function(cname)
 	Epilogue()
 	local B = Buildah("COMMIT")
 	B.cmd = {
@@ -1038,12 +1037,11 @@ ENV.COMMIT = function(cname, tag)
 		"--rm",
 		"--squash",
 		Name,
-		("containers-storage:%s:%s"):format(cname, tag),
+		("containers-storage:%s"):format(cname),
 	}
 	B.log = {
 		name = Name,
-		container = cname,
-		tag = tag,
+		image = cname,
 	}
 	B()
 end
