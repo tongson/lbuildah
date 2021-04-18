@@ -639,24 +639,31 @@ local Trim = function(s)
 	return sub(s, n)
 end
 local buildah = exec.ctx("buildah")
-local Buildah = function(a, msg, tbl, args)
-	if args then
-		local t = {}
-		for k in Gmatch(args, "%S+") do
-			a[#a + 1] = k
-			t[#t + 1] = k
-		end
-		tbl.args = Concat(t, " ")
-	end
-	buildah.env = { USER = os.getenv("USER"), HOME = os.getenv("HOME") }
-	local r, so, se = buildah(a)
-	if not r then
-		tbl.stdout = so
-		tbl.stderr = se
-		Panic(msg, tbl)
-	else
-		Ok(msg, tbl)
-	end
+buildah.env = { USER = os.getenv("USER"), HOME = os.getenv("HOME") }
+local Buildah = function(msg)
+	local set = {}
+	return setmetatable(set, {
+		__call = function(_, a)
+			a = a or ""
+			set.log = set.log or {}
+			local t = {}
+			local c = set.cmd
+			for k in Gmatch(a, "%S+") do
+				c[#c + 1] = k
+				t[#t + 1] = k
+			end
+			set.log.args = Concat(t, " ")
+			local r, so, se, err = buildah(c)
+			if not r then
+				set.log.stdout = so
+				set.log.stderr = se
+				set.log.error = err
+				Panic(msg, set.log)
+			else
+				Ok(msg, set.log)
+			end
+		end,
+	})
 end
 local ENV = {}
 setmetatable(ENV, {
@@ -732,16 +739,18 @@ ENV.FROM = function(base, cid, assets)
 	Assets = assets or fs.currentdir()
 	Name = cid or require("uid").new()
 	if not cid then
-		local a = {
+		local B = Buildah("FROM")
+		B.cmd = {
 			"from",
 			"--name",
 			Name,
 			base,
 		}
-		Buildah(a, "FROM", {
+		B.log = {
 			image = base,
 			name = Name,
-		})
+		}
+		B()
 	else
 		Ok("Reusing existing container", {
 			name = Name,
@@ -750,7 +759,8 @@ ENV.FROM = function(base, cid, assets)
 end
 ENV.ADD = function(src, dest, og)
 	og = og or "root:root"
-	local a = {
+	local B = Buildah("ADD")
+	B.cmd = {
 		"add",
 		"--chown",
 		og,
@@ -758,21 +768,24 @@ ENV.ADD = function(src, dest, og)
 		src,
 		dest,
 	}
-	Buildah(a, "ADD", {
+	B.log = {
 		source = src,
 		destination = dest,
-	})
+	}
+	B()
 end
 ENV.RUN = function(v)
-	local a = {
+	local B = Buildah("RUN")
+	B.cmd = {
 		"run",
 		Name,
 		"--",
 	}
-	Buildah(a, "RUN", {}, v)
+	B(v)
 end
 ENV.SCRIPT = function(s)
-	local a = {
+	local B = Buildah("SCRIPT")
+	B.cmd = {
 		"run",
 		"--volume",
 		("%s/%s:/%s"):format(Assets, s, s),
@@ -781,12 +794,12 @@ ENV.SCRIPT = function(s)
 		"/bin/sh",
 		("/%s"):format(s),
 	}
-	Buildah(a, "SCRIPT", {
-		script = a,
-	})
+	B.log = { script = s }
+	B()
 end
 ENV.APT_GET = function(v)
-	local a = {
+	local B = Buildah("APT_GET")
+	B.cmd = {
 		"run",
 		Name,
 		"--",
@@ -807,10 +820,11 @@ ENV.APT_GET = function(v)
 		"-o",
 		[[DPkg::options::='--force-unsafe-io']],
 	}
-	Buildah(a, "APT_GET", {}, v)
+	B(v)
 end
 ENV.APT_PURGE = function(p)
-	local a = {
+	local B = Buildah("APT_PURGE")
+	B.cmd = {
 		"run",
 		Name,
 		"--",
@@ -822,12 +836,12 @@ ENV.APT_PURGE = function(p)
 		"--force-unsafe-io",
 		p,
 	}
-	Buildah(a, "APT_PURGE", {
-		package = p,
-	})
+	B.log = { package = p }
+	B()
 end
 ENV.APK_UPGRADE = function()
-	local a = {
+	local B = Buildah("APK_UPGRADE")
+	B.cmd = {
 		"run",
 		Name,
 		"--",
@@ -837,10 +851,11 @@ ENV.APK_UPGRADE = function()
 		"--available",
 		"--no-progress",
 	}
-	Buildah(a, "APK_UPGRADE", {})
+	B()
 end
 ENV.APK_ADD = function(v)
-	local a = {
+	local B = Buildah("APK_ADD")
+	B.cmd = {
 		"run",
 		Name,
 		"--",
@@ -848,11 +863,12 @@ ENV.APK_ADD = function(v)
 		"add",
 		"--no-cache",
 	}
-	Buildah(a, "APK_ADD", {}, v)
+	B(v)
 end
 ENV.COPY = function(src, dest, og)
 	og = og or "root:root"
-	local a = {
+	local B = Buildah("COPY")
+	B.cmd = {
 		"copy",
 		"--chown",
 		og,
@@ -860,10 +876,11 @@ ENV.COPY = function(src, dest, og)
 		src,
 		dest,
 	}
-	Buildah(a, "COPY", {
+	B.log = {
 		source = src,
 		destination = dest,
-	})
+	}
+	B()
 end
 ENV.MKDIR = function(d, mode)
 	mode = mode or "0700"
@@ -940,91 +957,111 @@ ENV.RM = function(f)
 	Unmount()
 end
 ENV.CONFIG = function(config)
-	for k, v in pairs(config) do
-		local a = {
+	for k, v, B in pairs(config) do
+		B = Buildah("CONFIG")
+		B.cmd = {
 			"config",
 			("--%s"):format(k),
 			([['%s']]):format(v),
 			Name,
 		}
-		Buildah(a, "CONFIG", {
+		B.log = {
 			config = k,
 			value = v,
-		})
+		}
+		B()
 	end
 end
 ENV.ENTRYPOINT = function(entrypoint)
-	local a = {
-		"config",
-		"--entrypoint",
-		([['[\"%s\"]']]):format(entrypoint),
-		Name,
-	}
-	Buildah(a, "ENTRYPOINT(exe)", {
-		entrypoint = entrypoint,
-	})
-	a = {
-		"config",
-		"--cmd",
-		[['']],
-		Name,
-	}
-	Buildah(a, "ENTRYPOINT(cmd)", {
-		cmd = [['']],
-	})
-	a = {
-		"config",
-		"--stop-signal",
-		"TERM",
-		Name,
-	}
-	Buildah(a, "ENTRYPOINT(term)", {
-		term = "TERM",
-	})
+	do
+		local B = Buildah("ENTRYPOINT(exe)")
+		B.cmd = {
+			"config",
+			"--entrypoint",
+			([['[\"%s\"]']]):format(entrypoint),
+			Name,
+		}
+		B.log = {
+			entrypoint = entrypoint,
+		}
+		B()
+	end
+	do
+		local B = Buildah("ENTRYPOINT(cmd)")
+		B.cmd = {
+			"config",
+			"--cmd",
+			[['']],
+			Name,
+		}
+		B.log = {
+			cmd = [['']],
+		}
+		B()
+	end
+	do
+		local B = Buildah("ENTRYPOINT(term)")
+		B.cmd = {
+			"config",
+			"--stop-signal",
+			"TERM",
+			Name,
+		}
+		B.log = {
+			term = "TERM",
+		}
+		B()
+	end
 end
 ENV.ARCHIVE = function(cname)
 	Epilogue()
-	local a = {
+	local B = Buildah("ARCHIVE")
+	B.cmd = {
 		"commit",
 		"--rm",
 		"--squash",
 		Name,
 		("oci-archive:%s"):format(cname),
 	}
-	Buildah(a, "ARCHIVE", {
+	B.log = {
 		name = Name,
 		archive = cname,
-	})
+	}
+	B()
 end
 ENV.COMMIT = function(cname, tag)
 	tag = tag or Name
 	Epilogue()
-	local a = {
+	local B = Buildah("COMMIT")
+	B.cmd = {
 		"commit",
 		"--rm",
 		"--squash",
 		Name,
 		("containers-storage:%s:%s"):format(cname, tag),
 	}
-	Buildah(a, "COMMIT", {
+	B.log = {
 		name = Name,
 		container = cname,
 		tag = tag,
-	})
+	}
+	B()
 end
 ENV.DIR = function(dirname)
 	Epilogue()
-	local a = {
+	local B = Buildah("DIR")
+	B.cmd = {
 		"commit",
 		"--rm",
 		"--squash",
 		Name,
 		("dir:%s"):format(dirname),
 	}
-	Buildah(a, "DIR", {
+	B.log = {
 		name = Name,
 		path = dirname,
-	})
+	}
+	B()
 end
 ENV.TAR = function(filename)
 	local location = "/tmp/" .. Name
@@ -1034,17 +1071,19 @@ mv "${TAR}" "%s"
 rm -rf "%s"
 ]]
 	Epilogue()
-	local a = {
+	local B = Buildah("DIR -> TAR")
+	B.cmd = {
 		"commit",
 		"--rm",
 		"--squash",
 		Name,
 		("dir:%s"):format(location),
 	}
-	Buildah(a, "DIR->TAR", {
+	B.log = {
 		name = Name,
 		path = location,
-	})
+	}
+	B()
 	local sh = exec.ctx("sh")
 	local r, so, se = sh({
 		"-c",
