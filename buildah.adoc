@@ -137,7 +137,7 @@ Deletes specified path(string) or paths(list).
 [options="header"]
 |===
 |Required |Type |Description |Default |Example
-|Yes |string or table(list) |Path or paths | See below
+|Yes |string or table(list) |Path or paths | |See below
 |===
 
 === Example
