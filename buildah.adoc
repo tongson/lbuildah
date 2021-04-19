@@ -12,6 +12,13 @@ A DSL module for LadyLua.
 All instructions will signal an exit on error.
 ====
 
+:note-caption: :information_source:
+[NOTE]
+====
+Requires buildah(1) and crun(1).
+====
+
+
 toc::[]
 
 == *FROM* ([_IMAGE_][, _ID_][, _ASSETS_])
