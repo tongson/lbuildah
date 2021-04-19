@@ -2,7 +2,7 @@
 :toc:
 :toc-placement!:
 
-An abstraction for buildah commands. Create containers in Lua instead of Dockerfile instructions or shell scripts.
+An abstraction for https://github.com/containers/buildah[buildah(1)] commands. Create containers in Lua instead of Dockerfile instructions or shell scripts.
 
 A DSL module for LadyLua.
 
