@@ -210,6 +210,16 @@ Apply `--entrypoint`, `--cmd`, and `--stop-signal` in one instruction. A shortcu
 |Yes |varargs |Sequence of executable arguments | | "/sbin/tini", "--", "/usr/local/bin/jenkins.sh"
 |===
 
+== *COMMIT* (_PATH_)
+Writes the container into local `containers-storage`. Finalizes and deletes the container being worked on.
+
+=== Arguments
+[options="header"]
+|===
+|Required |Type |Description |Default |Example
+|Yes |string |Name and tag | | alpine:new
+|===
+
 == *ARCHIVE* (_PATH_)
 Create an OCI archive of the container. Finalizes and deletes the container being worked on.
 
