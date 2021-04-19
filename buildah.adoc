@@ -45,12 +45,12 @@ Runs a specified command and arguments using the container's root filesystem as 
 |===
 
 == *SCRIPT* (_FILE_)
-Runs script under the container's root filesystem. Require's a `/bin/sh` inside the container.
+Runs a shell script under the container's root filesystem. Require's a `/bin/sh` inside the container.
 
 === Arguments
 [options="header"]
 |===
 |Required |Type |Description |Default |Example
-|Yes |string |Shell script, without a leading (/) it reads from the *ASSETS* directory | |find_suid.sh
+|Yes |string |Shell script, without a leading (/) it reads from the *ASSETS* directory set in `FROM()` | |find_suid.sh
 |===
 
