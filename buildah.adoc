@@ -211,7 +211,7 @@ Apply `--entrypoint`, `--cmd`, and `--stop-signal` in one instruction. A shortcu
 |===
 
 == *ARCHIVE* (_PATH_)
-Create an OCI archive of container. Finalizes and deletes the container.
+Create an OCI archive of the container. Finalizes and deletes the container being worked on.
 
 === Arguments
 [options="header"]
