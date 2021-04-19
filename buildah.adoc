@@ -158,6 +158,8 @@ paths = {
 RM(paths)
 ----
 
+
+
 == *CONFIG* (_MAP_)
 Apply configuration settings to container.
 
@@ -195,4 +197,14 @@ Apply configuration settings to container.
 |workingdir |Default working directory |
 |===
 
+
+== *ENTRYPOINT* (_..._)
+Apply `--entrypoint`, `--cmd`, and `--stop-signal` in one instruction. A shortcut for common `CONFIG()` settings.
+
+=== Arguments
+[options="header"]
+|===
+|Required |Type |Description |Default |Example
+|Yes |varargs |Sequence of executable arguments | | "/sbin/tini", "--", "/usr/local/bin/jenkins.sh"
+|===
 
