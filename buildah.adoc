@@ -249,3 +249,26 @@ Writes contents of container root directory to a TAR file.
 |Required |Type |Description |Default |Example
 |Yes |Path |Destination path | | 
 |===
+
+== *PURGE* (_OPTION_)
+Purges a set of files and directories from the container.
+
+=== Arguments
+[options="header"]
+|===
+|Required |Type |Description |Default |Example
+|Yes |Set |See below | | 
+|===
+
+=== Set
+[options="header"]
+|===
+|Option |Description
+|deb |apt and dpkg toolchain from Debian-based images
+|perl |Perl
+|apk |apk toolchain from Alpine Linux images
+|userland |common Linux userland 
+|===
+|===
+
+
