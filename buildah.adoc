@@ -55,7 +55,7 @@ Runs a shell script under the container's root filesystem. Require's a `/bin/sh`
 |===
 
 == *APT_GET* (_COMMAND_)
-Run Debian `apt-get` commands.
+Run Debian `apt-get` command and arguments.
 
 === Arguments
 [options="header"]
