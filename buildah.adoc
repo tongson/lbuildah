@@ -28,8 +28,8 @@ Adds the contents of a file, URL, or directory to a destination path within the 
 [options="header"]
 |===
 |Required |Type |Description |Default |Example
-|Yes |String |File or URL | |sysctl.conf
-|Yes |String |Path | |/etc/sysctl.conf
-|No  |String |chown string, user and group ownership of destination |root:root |ed:ed
-|No  |String |chmod string, access permissions of destination |0700 |0644
+|Yes |string |File or URL | |sysctl.conf
+|Yes |string |Path | |/etc/sysctl.conf
+|No  |string |chown string, user and group ownership of destination |root:root |ed:ed
+|No  |string |chmod string, access permissions of destination |0700 |0644
 
