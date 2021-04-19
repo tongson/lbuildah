@@ -1,0 +1,21 @@
+= buildah
+:toc:
+:toc-placement!:
+
+An abstraction for buildah commands. Create containers in Lua instead of Dockerfile instructions or shell scripts.+
+ +
+A DSL module for LadyLua.
+
+toc::[]
+
+== *FROM*(_IMAGE_[, _NAME_, _ASSETS_])
+Creates a new working container, either from scratch, an image, or using an existing container as a starting point.
+
+=== Arguments
+[options="header",width="72%"]
+|===
+|Type |Description |Default |Example
+|string |Container image |"scratch"   |docker://docker.io/library/debian:buster-slim
+|string |Previously created container, here it is a 27-character KSUID |Generated KSUID |1kk...
+|string |Assets directory |. |/home/ed/buildah
+|===
