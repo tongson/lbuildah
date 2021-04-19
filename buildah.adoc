@@ -239,3 +239,13 @@ Writes contents of OCI image into directory. Finalizes and deletes the container
 |Required |Type |Description |Default |Example
 |Yes |Path |Destination path | | 
 |===
+
+== *TAR* (_PATH_)
+Writes contents of container root directory to a TAR file.
+
+=== Arguments
+[options="header"]
+|===
+|Required |Type |Description |Default |Example
+|Yes |Path |Destination path | | 
+|===
