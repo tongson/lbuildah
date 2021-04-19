@@ -32,4 +32,14 @@ Adds the contents of a file, URL, or directory to a destination path within the 
 |Yes |string |Path | |/etc/sysctl.conf
 |No  |string |chown string, user and group ownership of destination |root:root |ed:ed
 |No  |string |chmod string, access permissions of destination |0700 |0644
+|===
+
+== *RUN* (_COMMAND_)
+Runs a specified command and arguments using the container's root filesystem as a root filesystem.
+=== Arguments
+[options="header"]
+|===
+|Required |Type |Description |Default |Example
+|Yes |string |Command and arguments as one long string | |apk add vim
+|===
 
