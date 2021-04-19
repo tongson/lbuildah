@@ -64,3 +64,13 @@ Run Debian `apt-get` command and arguments.
 |Yes |string |apt-get commands as one long string | |install tmux
 |===
 
+== *APT_PURGE* (_PACKAGE_)
+Run Debian `dpkg --purge` on specified package.
+
+=== Arguments
+[options="header"]
+|===
+|Required |Type |Description |Default |Example
+|Yes |string |Debian package name | |tmux
+|===
+
