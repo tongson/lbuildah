@@ -229,3 +229,13 @@ Create an OCI archive of the container. Finalizes and deletes the container bein
 |Required |Type |Description |Default |Example
 |Yes |Path |Destination path for archive | | 
 |===
+
+== *DIR* (_PATH_)
+Writes contents of OCI image into directory. Finalizes and deletes the container being worked on.
+
+=== Arguments
+[options="header"]
+|===
+|Required |Type |Description |Default |Example
+|Yes |Path |Destination path | | 
+|===
