@@ -210,3 +210,12 @@ Apply `--entrypoint`, `--cmd`, and `--stop-signal` in one instruction. A shortcu
 |Yes |varargs |Sequence of executable arguments | | "/sbin/tini", "--", "/usr/local/bin/jenkins.sh"
 |===
 
+== *ARCHIVE* (_PATH_)
+Create an OCI archive of container. Finalizes and deletes the container.
+
+=== Arguments
+[options="header"]
+|===
+|Required |Type |Description |Default |Example
+|Yes |Path |Destination path for archive | | 
+|===
