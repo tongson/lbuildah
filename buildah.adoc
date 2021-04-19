@@ -263,7 +263,7 @@ Purges a set of files and directories from the container.
 === Option
 [options="header"]
 |===
-|Option |Description
+|String |Description
 |deb |apt and dpkg toolchain from Debian-based images
 |perl |Perl
 |apk |apk toolchain from Alpine Linux images
