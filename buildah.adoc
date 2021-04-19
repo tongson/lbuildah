@@ -12,7 +12,7 @@ toc::[]
 Creates a new working container, either from scratch, an image, or using an existing container as a starting point.
 
 === Arguments
-[options="header",width="72%"]
+[options="header"]
 |===
 |Required |Type |Description |Default |Example
 |No | string |Container image |"scratch"   |docker://docker.io/library/debian:buster-slim
