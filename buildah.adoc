@@ -15,8 +15,8 @@ Creates a new working container, either from scratch, an image, or using an exis
 [options="header"]
 |===
 |Required |Type |Description |Default |Example
-|No | string |Container image |"scratch"   |docker://docker.io/library/debian:buster-slim
-|No |string |A 27-character KSUID, you can use a previously created container  |Generated KSUID |1kk...
+|No | string |Container image |scratch   |docker://docker.io/library/debian:buster-slim
+|No |string |A 27-character KSUID. If set reuses the previously created container with this ID  |Generated KSUID |1kk...
 |No |string |Assets directory |current directory "." |/home/ed/buildah
 |===
 
