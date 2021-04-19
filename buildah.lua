@@ -758,13 +758,16 @@ ENV.FROM = function(base, cid, assets)
 		})
 	end
 end
-ENV.ADD = function(src, dest, og)
+ENV.ADD = function(src, dest, og, mo)
 	og = og or "root:root"
+	mo = mo or "0700"
 	local B = Buildah("ADD")
 	B.cmd = {
 		"add",
 		"--chown",
 		og,
+		"--chmod",
+		mo,
 		Name,
 		src,
 		dest,
