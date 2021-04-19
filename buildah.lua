@@ -927,7 +927,7 @@ ENV.MKDIR = function(d, mode)
 		})
 	end
 end
-ENV.CHMOD = function(mode, p)
+ENV.CHMOD = function(p, mode)
 	local chmod = exec.ctx("chmod")
 	chmod.cwd = Mount()
 	local r, so, se = chmod({
