@@ -210,7 +210,7 @@ Apply `--entrypoint`, `--cmd`, and `--stop-signal` in one instruction. A shortcu
 |Yes |varargs |Sequence of executable arguments | | "/sbin/tini", "--", "/usr/local/bin/jenkins.sh"
 |===
 
-== *COMMIT* (_PATH_)
+== *COMMIT* (_NAME_)
 Writes the container into local `containers-storage`. Finalizes and deletes the container being worked on.
 
 === Arguments
