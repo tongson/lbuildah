@@ -877,6 +877,7 @@ ENV.APK_ADD = function(v)
 	B(v)
 end
 ENV.COPY = function(src, dest, og)
+	dest = dest or "/" .. src
 	og = og or "root:root"
 	local B = Buildah("COPY")
 	B.cmd = {
