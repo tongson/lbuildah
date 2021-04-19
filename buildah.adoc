@@ -21,11 +21,9 @@ Creates a new working container, either from scratch, an image, or using an exis
 |===
 
 
-== *ADD* (_SOURCE_[, _DESTINATION_[, _CHOWN_][, _CHMOD_])
+== *ADD* (_SOURCE_, _DESTINATION_[, _CHOWN_][, _CHMOD_])
 Adds the contents of a file, URL, or directory to a destination path within the container.
 
---chmod string        set the access permissions of the destination content
-      --chown string        set the user and group ownership of the destination content[kkkk[
 === Arguments
 [options="header"]
 |===
