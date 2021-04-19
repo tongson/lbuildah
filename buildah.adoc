@@ -129,3 +129,24 @@ Runs chmod(1) against the specified path.
 |Yes |string |Path | | /home/ed/bin
 |Yes |string |Mode | |0700
 |===
+
+== *RM* (_PATH_)
+Deletes specified path(string) or paths(list).
+
+=== Arguments
+[options="header"]
+|===
+|Required |Type |Description |Default |Example
+|Yes |string or table(list) |Path or paths | See below
+|===
+
+=== Example
+
+----
+RM("/etc/sysctl.conf")
+paths = {
+  "/etc/sysctl.conf",
+  "/etc/hosts",
+}
+RM(paths)
+----
