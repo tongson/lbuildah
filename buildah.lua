@@ -1121,7 +1121,7 @@ rm -rf "%s"
 	end
 end
 ENV.PURGE = function(a, opts)
-	if a == "debian" or a == "dpkg" then
+	if a == "debian" or a == "dpkg" or a == "deb" then
 		local xargs = exec.ctx("xargs")
 		xargs.cwd = Mount()
 		xargs.stdin = stdin_dpkg
