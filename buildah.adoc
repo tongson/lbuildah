@@ -108,3 +108,13 @@ Copy file to a destination path within the container.
 |No  |string |chmod string, access permissions of destination |0700 |0644
 |===
 
+== *MKDIR* (_DIRECTORY_[, _MODE_])
+Creates directories and parent directories as needed within the container.
+
+=== Arguments
+[options="header"]
+|===
+|Required |Type |Description |Default |Example
+|Yes |string |Directory | | /home/ed/bin
+|No |string |Directory mode as in chmod(1) | |0700
+|===
