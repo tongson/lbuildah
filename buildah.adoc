@@ -260,7 +260,7 @@ Purges a set of files and directories from the container.
 |Yes |string|See below | | 
 |===
 
-=== Set
+=== Option
 [options="header"]
 |===
 |Option |Description
@@ -268,7 +268,6 @@ Purges a set of files and directories from the container.
 |perl |Perl
 |apk |apk toolchain from Alpine Linux images
 |userland |common Linux userland 
-|===
 |===
 
 
