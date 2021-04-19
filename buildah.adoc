@@ -227,7 +227,7 @@ Create an OCI archive of the container. Finalizes and deletes the container bein
 [options="header"]
 |===
 |Required |Type |Description |Default |Example
-|Yes |Path |Destination path for archive | | 
+|Yes |string |Destination path for archive | | 
 |===
 
 == *DIR* (_PATH_)
@@ -237,7 +237,7 @@ Writes contents of OCI image into directory. Finalizes and deletes the container
 [options="header"]
 |===
 |Required |Type |Description |Default |Example
-|Yes |Path |Destination path | | 
+|Yes |string |Destination path | | 
 |===
 
 == *TAR* (_PATH_)
@@ -247,7 +247,7 @@ Writes contents of container root directory to a TAR file.
 [options="header"]
 |===
 |Required |Type |Description |Default |Example
-|Yes |Path |Destination path | | 
+|Yes |string |Destination path | | 
 |===
 
 == *PURGE* (_OPTION_)
@@ -257,7 +257,7 @@ Purges a set of files and directories from the container.
 [options="header"]
 |===
 |Required |Type |Description |Default |Example
-|Yes |Set |See below | | 
+|Yes |string|See below | | 
 |===
 
 === Set
