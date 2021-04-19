@@ -880,14 +880,20 @@ ENV.APK_ADD = function(v)
 	}
 	B(v)
 end
-ENV.COPY = function(src, dest, og)
+ENV.COPY = function(src, dest, og, mo)
+	if src:sub(1, 1) ~= "/" then
+		src = Assets .. "/" .. src
+	end
 	dest = dest or "/" .. src
 	og = og or "root:root"
+	mo = mo or "0700"
 	local B = Buildah("COPY")
 	B.cmd = {
 		"copy",
 		"--chown",
 		og,
+		"--chmod",
+		mo,
 		Name,
 		src,
 		dest,
