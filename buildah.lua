@@ -738,6 +738,7 @@ local Json = require("json")
 ENV.FROM = function(base, cid, assets)
 	Assets = assets or fs.currentdir()
 	Name = cid or require("uid").new()
+	base = base or "scratch"
 	if not cid then
 		local B = Buildah("FROM")
 		B.cmd = {
