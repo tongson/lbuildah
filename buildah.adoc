@@ -94,5 +94,17 @@ Install packages inside an Alpine Linux container.
 |Required |Type |Description |Default |Example
 |Yes |string |Alpine packages as one long string | |strace
 |===
+
+== *COPY* (_SOURCE_, _DESTINATION_[, _CHOWN_][, _CHMOD_])
+Copy file to a destination path within the container.
+
+=== Arguments
+[options="header"]
+|===
+|Required |Type |Description |Default |Example
+|Yes |string |File, without a leading (/) it attempts to copy from the *ASSETS* directory set in `FROM()` | |sysctl.conf
+|Yes |string |Path | |/etc/sysctl.conf
+|No  |string |chown string, user and group ownership of destination |root:root |ed:ed
+|No  |string |chmod string, access permissions of destination |0700 |0644
 |===
 
