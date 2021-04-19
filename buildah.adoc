@@ -118,3 +118,14 @@ Creates directories and parent directories as needed within the container.
 |Yes |string |Directory | | /home/ed/bin
 |No |string |Directory mode as in chmod(1) | |0700
 |===
+
+== *CHMOD* (_PATH_, _MODE_)
+Runs chmod(1) agains the specifid path.
+
+=== Arguments
+[options="header"]
+|===
+|Required |Type |Description |Default |Example
+|Yes |string |Path | | /home/ed/bin
+|Yes |string |Mode | |0700
+|===
