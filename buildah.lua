@@ -1095,7 +1095,6 @@ rm -rf "%s"
 	local B = Buildah("DIR -> TAR")
 	B.cmd = {
 		"commit",
-		"--rm",
 		"--squash",
 		Name,
 		("dir:%s"):format(location),
