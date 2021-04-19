@@ -6,6 +6,12 @@ A wrapper for https://github.com/containers/buildah[buildah(1)] commands. Create
 
 A DSL module for LadyLua.
 
+:note-caption: :information_source:
+[NOTE]
+====
+All instructions will signal an exit on error.
+====
+
 toc::[]
 
 == *FROM* ([_IMAGE_][, _ID_][, _ASSETS_])
@@ -74,3 +80,7 @@ Run Debian `dpkg --purge` on specified package.
 |Yes |string |Debian package name | |tmux
 |===
 
+== *APK_UPGRADE* ()
+Run `/sbin/apk upgrade --no-cache --available --no-progress` inside an Alpine Linux container.
+
+No arguments.
