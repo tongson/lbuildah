@@ -201,6 +201,8 @@ Apply configuration settings to container.
 == *ENTRYPOINT* (_..._)
 Apply `--entrypoint`, `--cmd`, and `--stop-signal` in one instruction. A shortcut for common `CONFIG()` settings.
 
+`cmd`is set as `''` and `stop-signal` is `SIGTERM`.
+
 === Arguments
 [options="header"]
 |===
