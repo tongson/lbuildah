@@ -67,6 +67,17 @@ Runs a shell script under the container's root filesystem. Require's a `/bin/sh`
 |Yes |string |Shell script, without a leading (/) it reads from the *ASSETS* directory set in `FROM()` | |find_suid.sh
 |===
 
+== *SH* (_COMMAND_)
+Runs a shell command under the container's root filesystem. Require's a `/bin/sh` inside the container.
+
+=== Arguments
+[options="header"]
+|===
+|Required |Type |Description |Default |Example
+|Yes |string |Command as one long string | |echo "something" | md5sum
+|===
+
+
 == *APT_GET* (_COMMAND_)
 Run Debian `apt-get` command and arguments.
 
