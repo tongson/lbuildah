@@ -41,9 +41,9 @@ required = true
 [[RM.args]]
 type = "..."
 required = true
-[[CONFIG.args]]
-type = "table"
-required = true
+[CONFIG]
+property = true
+writable = "new-fields"
 [[ENTRYPOINT.args]]
 type = "..."
 required = true
