@@ -844,9 +844,9 @@ ENV.APT_GET = function(v)
 		"-o",
 		"Dpkg::Use-Pty=0",
 		"-o",
-		[[Dpkg::Options::='--force-confnew']],
+		[[Dpkg::Options::=--force-confnew]],
 		"-o",
-		[[DPkg::options::='--force-unsafe-io']],
+		[[DPkg::Options::=--force-unsafe-io]],
 	}
 	B(v)
 end
