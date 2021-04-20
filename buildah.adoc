@@ -226,6 +226,16 @@ Writes the container into local `containers-storage`. Finalizes and deletes the 
 |Yes |string |Name and tag | | alpine:new
 |===
 
+== *PUSH* (_URL_)
+Push image to URL, usually a container repository. Finalizes and deletes the container being worked on. Credentials are taken from environment variables `BUILDAH_USER` and `BUILDAH_PASS`.
+
+=== Arguments
+[options="header"]
+|===
+|Required |Type |Description |Default |Example
+|Yes |string |URL | | docker://example.com/webapp:new
+|===
+
 == *ARCHIVE* (_PATH_)
 Create an OCI archive of the container. Finalizes and deletes the container being worked on.
 
