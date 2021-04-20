@@ -891,6 +891,7 @@ ENV.APK = function(v)
 		Name,
 		"--",
 		"/sbin/apk",
+		"--no-progress",
 		"--no-cache",
 	}
 	B(v)
