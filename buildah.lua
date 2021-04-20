@@ -1071,6 +1071,24 @@ ENV.COMMIT = function(cname)
 	}
 	B()
 end
+ENV.PUSH = function(cname)
+	Epilogue()
+	local B = Buildah("PUSH")
+	B.cmd = {
+		"push",
+		"--quiet",
+		("--creds %s"):format(Creds),
+		"--rm",
+		"--squash",
+		Name,
+		("%s"):format(cname),
+	}
+	B.log = {
+		name = Name,
+		url = cname,
+	}
+	B()
+end
 ENV.DIR = function(dirname)
 	Epilogue()
 	local B = Buildah("DIR")
