@@ -675,7 +675,7 @@ local Name, Assets
 local Creds
 do
 	local ruser = os.getenv("BUILDAH_USER")
-	local rpass = os.getenv("BUILDAH_PASSWORD")
+	local rpass = os.getenv("BUILDAH_PASS")
 	if ruser and rpass then
 		Creds = ruser .. ":" .. rpass
 	end
