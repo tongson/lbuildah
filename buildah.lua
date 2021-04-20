@@ -1080,21 +1080,17 @@ ENV.COMMIT = function(cname)
 	}
 	B()
 end
-ENV.PUSH = function(cname)
-	Epilogue()
+ENV.PUSH = function(lc, cname)
 	local B = Buildah("PUSH")
 	B.cmd = {
 		"push",
-		"--quiet",
 		"--creds",
 		("%s"):format(Creds),
-		"--rm",
-		"--squash",
-		Name,
+		lc,
 		("%s"):format(cname),
 	}
 	B.log = {
-		name = Name,
+		name = lc,
 		url = cname,
 	}
 	B()
