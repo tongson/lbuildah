@@ -93,4 +93,4 @@ ENTRYPOINT("/sbin/tini", "--", "/usr/local/bin/jenkins.sh")
 -- from a derived Dockerfile, can use `RUN install-plugins.sh active.txt` to setup $REF/plugins from a support bundle
 COPY("install-plugins.sh", "/usr/local/bin/install-plugins.sh")
 COMMIT("jenkins:test")
-
+PUSH("jenkins:test", "docker://docker.pkg.github.com/tongson/containahs/jenkins:test")
