@@ -788,6 +788,18 @@ ENV.RUN = function(v)
 	}
 	B(v)
 end
+ENV.SH = function(sc)
+	local B = Buildah("SH")
+	B.cmd = {
+		"run",
+		Name,
+		"--",
+		"/bin/sh",
+		"-c",
+		sc,
+	}
+	B()
+end
 ENV.SCRIPT = function(s)
 	local script = [[chroot %s /bin/sh <<-'__58jvnv82_04fimmv'
 %s
