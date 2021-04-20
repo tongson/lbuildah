@@ -621,6 +621,7 @@ local list_apk = {
 	"var/lib/apk",
 }
 local Concat = table.concat
+local Unpack = unpack
 local Gmatch = string.gmatch
 local Ok = require("stdout").info
 local Panic = function(msg, tbl)
@@ -1204,6 +1205,15 @@ ENV.PURGE = function(a, opts)
 				stderr = se,
 			})
 		end
+	end
+end
+getmetatable("").__mod = function(a, b)
+	if not b then
+		return a
+	elseif type(b) == "table" then
+		return a:format(Unpack(b))
+	else
+		return a:format(b)
 	end
 end
 setfenv(3, ENV)
