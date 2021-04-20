@@ -180,46 +180,44 @@ RM(paths)
 == *CONFIG* (_MAP_)
 Apply configuration settings to container.
 
-:note-caption: :information_source:
-[NOTE]
-====
-Value can be a table(list or map). Automatically encoded to the JSON equivalent.
-====
-
-=== Arguments
+=== Keys
 [options="header"]
 |===
 |Required |Type |Description |Default |Example
-|Yes |table(map) |Key(string)-Value(string or table) settings | |See below
+|Yes | map |Key(string)-Value(string) | |See below
 |===
 
 === Map
 [options="header"]
 |===
 |Key |Description |Example
-|annotation |Annotation | { "annotation": "someting", "another": "something" }
-|arch |Architecture |
-|author |Author |
-|cmd |Default command|
-|comment |Comment |
-|domainname |Domain name|
-|env |environment variable | [ "PATH=/usr/bin" ]
+|ANNOTATION|Annotation |
+|ARCH|Architecture |
+|AUTHOR|Author |
+|CMD|Default command|
+|COMMENT|Comment |
+|DOMAINNAME|Domain name|
+|ENV|environment variable | 
 |healthcheck |Health check command|
 |healthcheck-interval |Health check command interval |
 |healthcheck-retries |Health check command number of retries  |
 |healthcheck-start-period |Amount of time to wait after starting a container before a failed health check counts as a failure |
 |healthcheck-timeout |Maximum time to wait for health check command |
-|hostname |Host name |
-|label |Labels | { "io.buildah.version": "1.20.0" }
-|os |Operating system |
-|port |Ports to expose | []
-|shell |Shell |
-|stop-signal |Signal e.g. SIGTERM |
-|user |Default user |
-|volume |Volume |/home/e
-|workingdir |Default working directory |
+|HOSTNAME|Host name |
+|LABEL|Labels |
+|OS|Operating system |
+|PORT|Ports to expose |
+|SHELL|Shell |
+|STOP-SIGNAL |Signal e.g. SIGTERM |
+|USER|Default user |
+|VOLUME|Volume |/home/e
+|WORKINGDIR|Default working directory |
 |===
 
+=== Example
+----
+CONFIG.ENV = "PATH=/usr/bin"
+----
 
 == *ENTRYPOINT* (_..._)
 Apply `--entrypoint`, `--cmd`, and `--stop-signal` in one instruction. A shortcut for common `CONFIG()` settings.
