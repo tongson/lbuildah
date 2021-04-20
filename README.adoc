@@ -7,10 +7,10 @@ A wrapper for https://github.com/containers/buildah[buildah(1)] commands. Create
 A DSL module for LadyLua.
 
 .*Lint and formatting*
-You can use `selene` and `stylua` for linting and formatting your code. A selene configuration is bundled with buildah.lua
+You can use `selene` and `stylua` for linting and formatting your code. A selene configuration is bundled with https://github.com/tongson/buildah.lua[buildah.lua].
 
 .*Sample*
-Check the `sample` directory for a sample of a non-trivial Dockerfile converted to Lua.
+Check the `sample` directory in the https://github.com/tongson/buildah.lua[repo] for a sample of a non-trivial Dockerfile converted to Lua.
 
 .*DSL*
 Besides the documented commands below, this DSL module also has a string interpolation extension.
