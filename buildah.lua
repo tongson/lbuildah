@@ -991,26 +991,21 @@ ENV.RM = function(f)
 	end
 	Unmount()
 end
-ENV.CONFIG = function(config)
-	for k, v, B in pairs(config) do
-		k = k:lower()
-		if type(v) == "table" then
-			v = Json.encode(v)
-		end
-		B = Buildah("CONFIG")
-		B.cmd = {
-			"config",
-			("--%s"):format(k),
-			([[%s]]):format(v),
-			Name,
-		}
-		B.log = {
-			config = k,
-			value = v,
-		}
-		B()
-	end
-end
+ENV.CONFIG = setmetatable({}, { __newindex = function(_, k, v)
+	k = k:lower()
+	local B = Buildah("CONFIG")
+	B.cmd = {
+		"config",
+		("--%s"):format(k),
+		([[%s]]):format(v),
+		Name,
+	}
+	B.log = {
+		config = k,
+		value = v,
+	}
+	B()
+end})
 ENV.ENTRYPOINT = function(...)
 	local entrypoint = Json.encode({ ... })
 	do
