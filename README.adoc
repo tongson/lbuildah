@@ -6,10 +6,10 @@ A wrapper for https://github.com/containers/buildah[buildah(1)] commands. Create
 
 A DSL module for LadyLua.
 
-*Lint and formatting*
+.Lint and formatting
 You can use `selene` and `stylua` for linting and formatting your code. A selene configuration is bundled with buildah.lua
 
-*Sample*
+.Sample
 Check the `sample` directory for a sample of a non-trivial Dockerfile converted to Lua.
 
 :note-caption: :information_source:
