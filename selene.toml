@@ -1,0 +1,4 @@
+std = "buildah"
+
+[rules]
+unscoped_variables = "allow"

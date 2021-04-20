@@ -1,0 +1,238 @@
+[selene]
+base = "lua51"
+name = "buildah"
+
+[[FROM.args]]
+type = "..."
+required = true
+[[ADD.args]]
+type = "..."
+required = true
+[[RUN.args]]
+type = "..."
+required = true
+[[SH.args]]
+type = "..."
+required = true
+[[SCRIPT.args]]
+type = "string"
+required = true
+[[APT_GET.args]]
+type = "string"
+required = true
+[[APT_PURGE.args]]
+type = "string"
+required = true
+[[APK_UPGRADE.args]]
+type = "..."
+required = false
+[[APK_ADD.args]]
+type = "string"
+required = true
+[[COPY.args]]
+type = "..."
+required = true
+[[MKDIR.args]]
+type = "..."
+required = true
+[[CHMOD.args]]
+type = "..."
+required = true
+[[RM.args]]
+type = "..."
+required = true
+[[CONFIG.args]]
+type = "table"
+required = true
+[[ENTRYPOINT.args]]
+type = "..."
+required = true
+[[ARCHIVE.args]]
+type = "string"
+required = true
+[[COMMIT.args]]
+type = "string"
+required = true
+[[PUSH.args]]
+type = "string"
+required = true
+[[DIR.args]]
+type = "string"
+required = true
+[[TAR.args]]
+type = "string"
+required = true
+[[PURGE.args]]
+type = "string"
+required = true
+
+[[fmt.print.args]]
+type = "..."
+required = true
+[[fmt.assert.args]]
+type = "..."
+required = true
+[[fmt.panic.args]]
+type = "..."
+required = true
+[[fmt.warn.args]]
+type = "..."
+required = true
+[[fmt.error.args]]
+type = "..."
+required = true
+
+
+[[fs.write.args]]
+type = "string"
+required = true
+[[fs.write.args]]
+type = "string"
+required = true
+[[fs.read.args]]
+type = "string"
+required = true
+[[fs.isdir.args]]
+type = "string"
+required = true
+[[fs.isfile.args]]
+type = "string"
+required = true
+[[fs.mkdir.args]]
+type = "string"
+required = true
+[[fs.rmdir.args]]
+type = "string"
+required = true
+[[fs.chdir.args]]
+type = "string"
+required = true
+[[fs.attributes.args]]
+type = "string"
+required = true
+[[fs.symlinkattributes.args]]
+type = "string"
+required = true
+[fs.currentdir]
+args = []
+[[fs.link.args]]
+type = "string"
+required = true
+[[fs.link.args]]
+type = "string"
+required = true
+[[fs.link.args]]
+type = "bool"
+required = false
+[[fs.dir.args]]
+type = "string"
+required = true
+[[fs.touch.args]]
+type = "string"
+required = true
+
+
+[[exec.command.args]]
+type = "string"
+required = true
+[[exec.command.args]]
+type = "table"
+required = false
+[[exec.command.args]]
+type = "table"
+required = false
+[[exec.command.args]]
+type = "string"
+required = false
+[[exec.command.args]]
+type = "string"
+required = false
+[[exec.ctx.args]]
+type = "string"
+required = true
+[[exec.cmd.args]]
+type = "string"
+required = true
+[exec.run]
+property = true
+writable = "new-fields"
+
+
+[[string.to_list.args]]
+type = "string"
+required = true
+[[string.word_to_list.args]]
+type = "string"
+required = true
+[[string.line_to_list.args]]
+type = "string"
+required = true
+[[string.append.args]]
+type = "string"
+required = true
+[[string.append.args]]
+type = "string"
+required = true
+
+
+[[table.find.args]]
+type = "table"
+required = true
+[[table.find.args]]
+type = "string"
+required = true
+[[table.find.args]]
+type = "bool"
+required = false
+[[table.filter.args]]
+type = "table"
+required = true
+[[table.filter.args]]
+type = "string"
+required = true
+[[table.filter.args]]
+type = "bool"
+required = false
+[[table.to_map.args]]
+type = "table"
+required = true
+[[table.to_map.args]]
+type = "any"
+required = false
+[[table.to_map.args]]
+type = "bool"
+required = false
+[[table.to_list.args]]
+type = "table"
+required = true
+[[table.insert_if.args]]
+type = "table"
+required = true
+[[table.insert_if.args]]
+type = "any"
+required = true
+[[table.insert_if.args]]
+type = "any"
+required = true
+[[table.insert_if.args]]
+type = "number"
+required = false
+[[table.auto.args]]
+type = "table"
+required = false
+[[table.len.args]]
+type = "table"
+required = true
+[[table.len.args]]
+type = "number"
+required = false
+[[table.count.args]]
+type = "table"
+required = true
+[[table.count.args]]
+type = "any"
+required = true
+[[table.unique.args]]
+type = "table"
+required = true
+
