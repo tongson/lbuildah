@@ -173,7 +173,7 @@ Value can be a table(list or map). Automatically encoded to the JSON equivalent.
 [options="header"]
 |===
 |Required |Type |Description |Default |Example
-|Yes |table(map) |Key-value settings | |See below
+|Yes |table(map) |Key(string)-Value(string or table) settings | |See below
 |===
 
 === Map
