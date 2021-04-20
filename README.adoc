@@ -189,11 +189,11 @@ RM(paths)
 == *CONFIG* (_MAP_)
 Apply configuration settings to container.
 
-=== Keys
+=== Usage
 [options="header"]
 |===
-|Required |Type |Description |Default |Example
-|Yes | map |Key(string)-Value(string) | |See below
+|Required |Type |Description 
+|Yes | map |Key(string)-Value(string)
 |===
 
 === Map
