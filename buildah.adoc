@@ -210,7 +210,7 @@ Value can be a table(list or map). Automatically encoded to the JSON equivalent.
 |shell |Shell |
 |stop-signal |Signal e.g. SIGTERM |
 |user |Default user |
-|volume |Volume |[]
+|volume |Volume |/home/e
 |workingdir |Default working directory |
 |===
 
