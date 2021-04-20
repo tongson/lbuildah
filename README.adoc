@@ -12,6 +12,13 @@ You can use `selene` and `stylua` for linting and formatting your code. A selene
 .*Sample*
 Check the `sample` directory for a sample of a non-trivial Dockerfile converted to Lua.
 
+.*DSL*
+Besides the documented commands below. This DSL module also has a string interpolation extension. Example:
+----
+JENKINS_HOME = "/var/jenkins_home"
+CONFIG.ENV = "JENKINS_HOME=%s" % JENKINS_HOME
+----
+
 :note-caption: :information_source:
 [NOTE]
 ====
