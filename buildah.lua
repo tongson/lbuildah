@@ -980,11 +980,14 @@ ENV.RM = function(f)
 end
 ENV.CONFIG = function(config)
 	for k, v, B in pairs(config) do
+		if type(v) == "table" then
+			v = Json.encode(v)
+		end
 		B = Buildah("CONFIG")
 		B.cmd = {
 			"config",
 			("--%s"):format(k),
-			([['%s']]):format(v),
+			([[%s]]):format(v),
 			Name,
 		}
 		B.log = {
