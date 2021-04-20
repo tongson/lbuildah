@@ -163,6 +163,12 @@ RM(paths)
 == *CONFIG* (_MAP_)
 Apply configuration settings to container.
 
+:note-caption: :information_source:
+[NOTE]
+====
+Value can be a table(list or map). Automatically encoded to the JSON equivalent.
+====
+
 === Arguments
 [options="header"]
 |===
