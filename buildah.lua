@@ -993,6 +993,7 @@ ENV.RM = function(f)
 end
 ENV.CONFIG = function(config)
 	for k, v, B in pairs(config) do
+		k = k:lower()
 		if type(v) == "table" then
 			v = Json.encode(v)
 		end
