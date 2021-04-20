@@ -1022,19 +1022,6 @@ ENV.ENTRYPOINT = function(...)
 		B()
 	end
 	do
-		local B = Buildah("ENTRYPOINT(cmd)")
-		B.cmd = {
-			"config",
-			"--cmd",
-			[['']],
-			Name,
-		}
-		B.log = {
-			cmd = [['']],
-		}
-		B()
-	end
-	do
 		local B = Buildah("ENTRYPOINT(term)")
 		B.cmd = {
 			"config",
