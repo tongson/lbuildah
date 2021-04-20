@@ -58,8 +58,8 @@ Adds the contents of a file, URL, or directory to a destination path within the 
 |Required |Type |Description |Default |Example
 |Yes |string |File or URL | |sysctl.conf
 |Yes |string |Path | |/etc/sysctl.conf
-|No  |string |chown string, user and group ownership of destination |root:root |ed:ed
-|No  |string |chmod string, access permissions of destination |0700 |0644
+|No  |string |chown string, user and group ownership of destination | |ed:ed
+|No  |string |chmod string, access permissions of destination ||0644
 |===
 
 == *RUN* (_COMMAND_)
@@ -137,8 +137,8 @@ Copy file to a destination path within the container.
 |Required |Type |Description |Default |Example
 |Yes |string |File, without a leading (/) it attempts to copy from the *ASSETS* directory set in `FROM()` | |sysctl.conf
 |No |string |Path | Copies _SOURCE_ to the container's root(/) directory |/etc/sysctl.conf
-|No  |string |chown string, user and group ownership of destination |root:root |ed:ed
-|No  |string |chmod string, access permissions of destination |0700 |0644
+|No  |string |chown string, user and group ownership of destination ||ed:ed
+|No  |string |chmod string, access permissions of destination | |0644
 |===
 
 == *MKDIR* (_DIRECTORY_[, _MODE_])
