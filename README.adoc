@@ -113,11 +113,6 @@ Run Debian `dpkg --purge` on specified package.
 |Yes |string |Debian package name | |tmux
 |===
 
-== *APK_UPGRADE* ()
-Run `/sbin/apk upgrade --no-cache --available --no-progress` inside an Alpine Linux container.
-
-No arguments.
-
 == *APK* (_COMMAND_)
 Run APK command inside an Alpine Linux container.
 
