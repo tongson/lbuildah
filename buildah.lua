@@ -1086,7 +1086,8 @@ ENV.PUSH = function(cname)
 	B.cmd = {
 		"push",
 		"--quiet",
-		("--creds %s"):format(Creds),
+		"--creds",
+		("%s"):format(Creds),
 		"--rm",
 		"--squash",
 		Name,
