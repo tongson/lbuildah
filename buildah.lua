@@ -884,14 +884,13 @@ ENV.APK_UPGRADE = function()
 	}
 	B()
 end
-ENV.APK_ADD = function(v)
-	local B = Buildah("APK_ADD")
+ENV.APK = function(v)
+	local B = Buildah("APK")
 	B.cmd = {
 		"run",
 		Name,
 		"--",
 		"/sbin/apk",
-		"add",
 		"--no-cache",
 	}
 	B(v)
