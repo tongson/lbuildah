@@ -628,11 +628,11 @@ local Unpack = unpack
 local Gmatch = string.gmatch
 local Ok = function(msg, tbl)
 	local stdout = require("logger").new("stdout")
-	stdout.info(msg, tbl)
+	stdout:info(msg, tbl)
 end
 local Panic = function(msg, tbl)
 	local stderr = require("logger").new()
-	stderr(msg, tbl)
+	stderr:error(msg, tbl)
 	Notify(msg, tbl)
 	os.exit(1)
 end
@@ -761,12 +761,12 @@ ENV.NOTIFY = setmetatable({}, {
 			if key == "TELEGRAM" then
 				local telegram = require("telegram")
 				local api = telegram.new()
-				api.channel(v, payload)
+				api:channel(v, payload)
 			end
 			if key == "PUSHOVER" then
 				local pushover = require("pushover")
 				local api = pushover.new()
-				api.message(v, payload)
+				api:message(v, payload)
 			end
 		end
 	end,
@@ -787,8 +787,10 @@ ENV.FROM = function(base, cid, assets)
 			image = base,
 			name = Name,
 		}
+		Notify("FROM", { base = base, name = Name })
 		B()
 	else
+		Notify("FROM", { base = "reusing", name = Name})
 		Ok("Reusing existing container", {
 			name = Name,
 		})
