@@ -759,6 +759,7 @@ ENV.NOTIFY = setmetatable({}, {
 		Notify_Toggle[key] = v
 		Notify = function(msg, tbl)
 			tbl.message = msg
+			tbl.time = os.date("%Y-%m-%d %H:%M:%S %Z%z")
 			local payload = Json.encode(tbl)
 			if Notify_Toggle.TELEGRAM then
 				local telegram = require("telegram")
