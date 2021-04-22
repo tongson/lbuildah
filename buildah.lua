@@ -677,6 +677,7 @@ local Buildah = function(msg)
 					ARCHIVE = true,
 					DIR = true,
 				}
+				set.log.WHAT = "buildah.lua"
 				if final[msg] then
 					Notify(msg, set.log)
 				end
@@ -798,7 +799,7 @@ ENV.FROM = function(base, cid, assets)
 		Notify("FROM", { base = base, name = Name })
 		B()
 	else
-		Notify("FROM", { base = "reusing", name = Name })
+		Notify("FROM", { WHAT = "buildah.lua", base = "reusing", name = Name })
 		Ok("Reusing existing container", {
 			name = Name,
 		})
