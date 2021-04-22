@@ -629,10 +629,12 @@ local Unpack = unpack
 local Gmatch = string.gmatch
 local Ok = function(msg, tbl)
 	local stdout = require("logger").new("stdout")
+	tbl.WHAT = "buildah.lua"
 	stdout:info(msg, tbl)
 end
 local Panic = function(msg, tbl)
 	local stderr = require("logger").new()
+	tbl.WHAT = "buildah.lua"
 	stderr:error(msg, tbl)
 	Notify(msg, tbl)
 	os.exit(1)
