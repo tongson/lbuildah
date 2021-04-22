@@ -677,7 +677,6 @@ local Buildah = function(msg)
 					ARCHIVE = true,
 					DIR = true,
 				}
-				set.log.WHAT = "buildah.lua"
 				if final[msg] then
 					Notify(msg, set.log)
 				end
@@ -764,6 +763,7 @@ ENV.NOTIFY = setmetatable({}, {
 			local util = require("util")
 			tbl.message = msg
 			tbl.time = util.timestamp()
+			tbl.WHAT = "buildah.lua"
 			local payload = Json.encode(tbl)
 			if Notify_Toggle.TELEGRAM then
 				local telegram = require("telegram")
@@ -799,7 +799,7 @@ ENV.FROM = function(base, cid, assets)
 		Notify("FROM", { base = base, name = Name })
 		B()
 	else
-		Notify("FROM", { WHAT = "buildah.lua", base = "reusing", name = Name })
+		Notify("FROM", { base = "reusing", name = Name })
 		Ok("Reusing existing container", {
 			name = Name,
 		})
