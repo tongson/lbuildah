@@ -620,6 +620,7 @@ local list_apk = {
 	"usr/share/apk",
 	"var/lib/apk",
 }
+local Notify_Toggle = {}
 local Notify = function()
 end
 local Concat = table.concat
@@ -754,19 +755,20 @@ end
 local Json = require("json")
 ENV.NOTIFY = setmetatable({}, {
 	__newindex = function(_, k, v)
+		local key = k:upper()
+		Notify_Toggle[key] = v
 		Notify = function(msg, tbl)
 			tbl.message = msg
 			local payload = Json.encode(tbl)
-			local key = k:upper()
-			if key == "TELEGRAM" then
+			if Notify_Toggle.TELEGRAM then
 				local telegram = require("telegram")
 				local api = telegram.new()
-				api:channel(v, payload)
+				api:channel(Notify_Toggle.TELEGRAM, payload)
 			end
-			if key == "PUSHOVER" then
+			if Notify_Toggle.PUSHOVER then
 				local pushover = require("pushover")
 				local api = pushover.new()
-				api:message(v, payload)
+				api:message(Notify_Toggle.PUSHOVER, payload)
 			end
 		end
 	end,
@@ -790,7 +792,7 @@ ENV.FROM = function(base, cid, assets)
 		Notify("FROM", { base = base, name = Name })
 		B()
 	else
-		Notify("FROM", { base = "reusing", name = Name})
+		Notify("FROM", { base = "reusing", name = Name })
 		Ok("Reusing existing container", {
 			name = Name,
 		})
