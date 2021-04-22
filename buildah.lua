@@ -760,18 +760,21 @@ ENV.NOTIFY = setmetatable({}, {
 		local key = k:upper()
 		Notify_Toggle[key] = v
 		Notify = function(msg, tbl)
+			local util = require("util")
 			tbl.message = msg
-			tbl.time = os.date("%Y-%m-%d %H:%M:%S %Z%z")
+			tbl.time = util.timestamp()
 			local payload = Json.encode(tbl)
 			if Notify_Toggle.TELEGRAM then
 				local telegram = require("telegram")
 				local api = telegram.new()
-				api:channel(Notify_Toggle.TELEGRAM, payload)
+				local send = util.retry_f(api.channel)
+				send(api, Notify_Toggle.TELEGRAM, payload)
 			end
 			if Notify_Toggle.PUSHOVER then
 				local pushover = require("pushover")
 				local api = pushover.new()
-				api:message(Notify_Toggle.PUSHOVER, payload)
+				local send = util.retry_f(api.message)
+				send(api, Notify_Toggle.PUSHOVER, payload)
 			end
 		end
 	end,
