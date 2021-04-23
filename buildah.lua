@@ -629,12 +629,12 @@ local Unpack = unpack
 local Gmatch = string.gmatch
 local Ok = function(msg, tbl)
 	local stdout = require("logger").new("stdout")
-	tbl.WHAT = "buildah.lua"
+	tbl._ident = "buildah.lua"
 	stdout:info(msg, tbl)
 end
 local Panic = function(msg, tbl)
 	local stderr = require("logger").new()
-	tbl.WHAT = "buildah.lua"
+	tbl._ident = "buildah.lua"
 	stderr:error(msg, tbl)
 	Notify(msg, tbl)
 	os.exit(1)
@@ -763,7 +763,7 @@ ENV.NOTIFY = setmetatable({}, {
 			local util = require("util")
 			tbl.message = msg
 			tbl.time = util.timestamp()
-			tbl.WHAT = "buildah.lua"
+			tbl._ident = "buildah.lua"
 			local payload = Json.encode(tbl)
 			if Notify_Toggle.TELEGRAM then
 				local telegram = require("telegram")
@@ -776,6 +776,22 @@ ENV.NOTIFY = setmetatable({}, {
 				local api = pushover.new()
 				local send = util.retry_f(api.message)
 				send(api, Notify_Toggle.PUSHOVER, payload)
+			end
+			if Notify_Toggle.SLACK then
+				local slack = require("slack")
+				local attachment = {
+					Fallback = payload,
+					Color = "#2eb886",
+					AuthorName = tbl.name,
+					AuthorSubname = tbl.message,
+					AuthorLink = "https://github.com/tongson/buildah.lua",
+					AuthorIcon = "https://avatars2.githubusercontent.com/u/652790",
+					Text = "```"..payload.."```",
+					Footer = "buildah.lua",
+					FooterIcon = "https://platform.slack-edge.com/img/default_application_icon.png",
+				}
+				local send = util.retry_f(slack.attachment)
+				send(attachment)
 			end
 		end
 	end,
