@@ -627,13 +627,14 @@ local Concat = table.concat
 local Insert = table.insert
 local Unpack = unpack
 local Gmatch = string.gmatch
+local Logger = require("logger")
 local Ok = function(msg, tbl)
-	local stdout = require("logger").new("stdout")
+	local stdout = Logger.new("stdout")
 	tbl._ident = "buildah.lua"
 	stdout:info(msg, tbl)
 end
 local Panic = function(msg, tbl)
-	local stderr = require("logger").new()
+	local stderr = Logger.new()
 	tbl._ident = "buildah.lua"
 	stderr:error(msg, tbl)
 	Notify(msg, tbl)
@@ -762,7 +763,7 @@ ENV.NOTIFY = setmetatable({}, {
 		Notify = function(msg, tbl)
 			local util = require("util")
 			tbl.message = msg
-			tbl.time = util.timestamp()
+			tbl.time = Logger.time()
 			tbl._ident = "buildah.lua"
 			local payload = Json.encode(tbl)
 			if Notify_Toggle.TELEGRAM then
