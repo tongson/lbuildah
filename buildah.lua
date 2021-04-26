@@ -847,7 +847,7 @@ ENV.FROM = function(base, cid, assets)
 end
 ENV.ADD = function(src, dest, og, mo)
 	if not Name then
-		Ok("ADD",{ skip = true, name = false })
+		Ok("ADD", { skip = true, name = false })
 		return
 	end
 	local B = Buildah("ADD")
@@ -873,7 +873,7 @@ ENV.ADD = function(src, dest, og, mo)
 end
 ENV.RUN = function(v)
 	if not Name then
-		Ok("RUN",{ skip = true, name = false })
+		Ok("RUN", { skip = true, name = false })
 		return
 	end
 	local B = Buildah("RUN")
@@ -886,7 +886,7 @@ ENV.RUN = function(v)
 end
 ENV.SH = function(sc)
 	if not Name then
-		Ok("SH",{ skip = true, name = false })
+		Ok("SH", { skip = true, name = false })
 		return
 	end
 	local B = Buildah("SH")
@@ -902,7 +902,7 @@ ENV.SH = function(sc)
 end
 ENV.RR = function(dir, a)
 	if not Name then
-		Ok("RR",{ skip = true, name = false })
+		Ok("RR", { skip = true, name = false })
 		return
 	end
 	local sc = [[
@@ -928,7 +928,7 @@ ENV.RR = function(dir, a)
 end
 ENV.SCRIPT = function(s)
 	if not Name then
-		Ok("SCRIPT",{ skip = true, name = false })
+		Ok("SCRIPT", { skip = true, name = false })
 		return
 	end
 	local script = [[chroot %s /bin/sh <<-'__58jvnv82_04fimmv'
@@ -957,7 +957,7 @@ __58jvnv82_04fimmv
 end
 ENV.APT_GET = function(v)
 	if not Name then
-		Ok("APT_GET",{ skip = true, name = false })
+		Ok("APT_GET", { skip = true, name = false })
 		return
 	end
 	local B = Buildah("APT_GET")
@@ -986,7 +986,7 @@ ENV.APT_GET = function(v)
 end
 ENV.APT_PURGE = function(p)
 	if not Name then
-		Ok("APT_PURGE",{ skip = true, name = false })
+		Ok("APT_PURGE", { skip = true, name = false })
 		return
 	end
 	local B = Buildah("APT_PURGE")
@@ -1007,7 +1007,7 @@ ENV.APT_PURGE = function(p)
 end
 ENV.APK = function(v)
 	if not Name then
-		Ok("APK",{ skip = true, name = false })
+		Ok("APK", { skip = true, name = false })
 		return
 	end
 	local B = Buildah("APK")
@@ -1023,7 +1023,7 @@ ENV.APK = function(v)
 end
 ENV.COPY = function(src, dest, og, mo)
 	if not Name then
-		Ok("COPY",{ skip = true, name = false })
+		Ok("COPY", { skip = true, name = false })
 		return
 	end
 	dest = dest or "/" .. src
@@ -1054,7 +1054,7 @@ end
 ENV.UPLOAD = ENV.COPY
 ENV.MKDIR = function(d, mode)
 	if not Name then
-		Ok("MKDIR",{ skip = true, name = false })
+		Ok("MKDIR", { skip = true, name = false })
 		return
 	end
 	local mkdir = exec.ctx("mkdir")
@@ -1083,7 +1083,7 @@ ENV.MKDIR = function(d, mode)
 end
 ENV.CHMOD = function(p, mode)
 	if not Name then
-		Ok("CHMOD",{ skip = true, name = false })
+		Ok("CHMOD", { skip = true, name = false })
 		return
 	end
 	local chmod = exec.ctx("chmod")
@@ -1107,7 +1107,7 @@ ENV.CHMOD = function(p, mode)
 end
 ENV.DOWNLOAD = function(src, dest)
 	if not Name then
-		Ok("DOWNLOAD",{ skip = true, name = false })
+		Ok("DOWNLOAD", { skip = true, name = false })
 		return
 	end
 	local cwd = fs.currentdir()
@@ -1144,7 +1144,7 @@ ENV.DOWNLOAD = function(src, dest)
 end
 ENV.RM = function(f)
 	if not Name then
-		Ok("RM",{ skip = true, name = false })
+		Ok("RM", { skip = true, name = false })
 		return
 	end
 	local rm = exec.ctx("rm")
@@ -1324,7 +1324,7 @@ rm -rf "%s"
 end
 ENV.PURGE = function(a, opts)
 	if not Name then
-		Ok("PURGE",{ skip = true, name = false })
+		Ok("PURGE", { skip = true, name = false })
 		return
 	end
 	if a == "debian" or a == "dpkg" or a == "deb" then
