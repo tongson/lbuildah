@@ -138,7 +138,7 @@ Copy file to a destination path within the container.
 |No  |string |chmod string, access permissions of destination | |0644
 |===
 
-== *DOWNLOAD* (_SOURCE_, _DESTINATION_)
+== *DOWNLOAD* (_SOURCE_[, _DESTINATION_])
 Copy file from container to destination path.
 
 === Arguments
