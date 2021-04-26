@@ -1017,6 +1017,31 @@ ENV.CHMOD = function(p, mode)
 		})
 	end
 end
+ENV.DOWNLOAD = function(src, dest)
+	local cp = exec.ctx("cp")
+	cp.cwd = Mount()
+	local r, so, se = cp({
+		"-R",
+		"-P",
+		"-n",
+		Trim(src),
+		dest,
+	})
+	Unmount()
+	if r then
+		Ok("DOWNLOAD", {
+			source = src,
+			destination = dest,
+		})
+	else
+		Panic("DOWNLOAD", {
+			source = src,
+			destination = dest,
+			stdout = so,
+			stderr = se,
+		})
+	end
+end
 ENV.RM = function(f)
 	local rm = exec.ctx("rm")
 	rm.cwd = Mount()
