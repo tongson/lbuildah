@@ -969,7 +969,7 @@ ENV.COPY = function(src, dest, og, mo)
 	if src:sub(1, 1) ~= "/" then
 		src = Assets .. "/" .. src
 	end
-	local B = Buildah("COPY")
+	local B = Buildah("COPY/UPLOAD")
 	B.cmd = {
 		"copy",
 		Name,
