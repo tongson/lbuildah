@@ -33,6 +33,11 @@ All instructions will signal an exit on error.
 Requires buildah(1) and crun(1).
 ====
 
+:note-caption: :information_source:
+[NOTE]
+====
+Any instructions before FROM() is skipped.
+====
 
 toc::[]
 
