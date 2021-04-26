@@ -867,14 +867,14 @@ ENV.SH = function(sc)
 	}
 	B()
 end
-ENV.RERUN = function(dir, a)
+ENV.RR = function(dir, a)
 	local sc = [[
 	cd __DIR__
 	rr __RERUN__
 	]]
 	sc = sc:gsub("__DIR__", dir)
 	sc = sc:gsub("__RERUN__", a)
-	local B = Buildah("RERUN")
+	local B = Buildah("RR")
 	B.cmd = {
 		"run",
 		Name,
