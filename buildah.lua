@@ -1043,6 +1043,7 @@ end
 ENV.DOWNLOAD = function(src, dest)
 	local cwd = fs.currentdir()
 	local rd
+	dest = dest or "."
 	if dest:sub(1, 1) == "/" then
 		rd = dest
 	else
