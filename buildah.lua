@@ -1019,6 +1019,13 @@ ENV.CHMOD = function(p, mode)
 	end
 end
 ENV.DOWNLOAD = function(src, dest)
+	local cwd = fs.currentdir()
+	local rd
+	if dest:sub(1,1) == "/" then
+		rd = dest
+	else
+		rd = cwd.."/"..dest
+  end
 	local cp = exec.ctx("cp")
 	cp.cwd = Mount()
 	local r, so, se = cp({
@@ -1026,7 +1033,7 @@ ENV.DOWNLOAD = function(src, dest)
 		"-P",
 		"-n",
 		Trim(src),
-		dest,
+		rd,
 	})
 	Unmount()
 	if r then
