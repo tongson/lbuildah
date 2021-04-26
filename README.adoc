@@ -124,6 +124,8 @@ Run APK command inside an Alpine Linux container.
 |===
 
 == *COPY* (_SOURCE_, _DESTINATION_[, _CHOWN_][, _CHMOD_])
+Alias: *UPLOAD* +
+
 Copy file to a destination path within the container.
 
 === Arguments
@@ -134,6 +136,17 @@ Copy file to a destination path within the container.
 |No |string |Path | Copies _SOURCE_ to the container's root(/) directory |/etc/sysctl.conf
 |No  |string |chown string, user and group ownership of destination ||ed:ed
 |No  |string |chmod string, access permissions of destination | |0644
+|===
+
+== *DOWNLOAD* (_SOURCE_, _DESTINATION_)
+Copy file from container to destination path.
+
+=== Arguments
+[options="header"]
+|===
+|Required |Type |Description |Default |Example
+|Yes |string |Path within container | |/sysctl.conf
+|No |string |Path | . |
 |===
 
 == *MKDIR* (_DIRECTORY_[, _MODE_])
