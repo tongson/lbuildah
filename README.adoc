@@ -73,7 +73,7 @@ Runs a specified command and arguments using the container's root filesystem as 
 |===
 
 == *SCRIPT* (_FILE_)
-Runs a shell script under the container's root filesystem.
+Runs a shell script upon the container's root filesystem. Does *NOT* run the script within the container.
 
 === Arguments
 [options="header"]
