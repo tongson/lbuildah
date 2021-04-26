@@ -883,6 +883,10 @@ ENV.RERUN = function(dir, a)
 		"-c",
 		sc,
 	}
+	B.log = {
+		directory = dir,
+		args = a,
+	}
 	B()
 end
 ENV.SCRIPT = function(s)
