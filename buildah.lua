@@ -867,6 +867,24 @@ ENV.SH = function(sc)
 	}
 	B()
 end
+ENV.RERUN = function(dir, a)
+	local sc = [[
+	cd __DIR__
+	rr __RERUN__
+	]]
+	sc = sc:gsub("__DIR__", dir)
+	sc = sc:gsub("__RERUN__", a)
+	local B = Buildah("RERUN")
+	B.cmd = {
+		"run",
+		Name,
+		"--",
+		"/bin/sh",
+		"-c",
+		sc,
+	}
+	B()
+end
 ENV.SCRIPT = function(s)
 	local script = [[chroot %s /bin/sh <<-'__58jvnv82_04fimmv'
 %s
