@@ -636,9 +636,11 @@ local Ok = function(msg, tbl)
 	stdout:info(msg, tbl)
 end
 local Panic = function(msg, tbl)
-	local trace = function(num)
+	local trace = function()
 		local start_frame = 2
 		local frame = start_frame
+		local ln
+		local src
 		while true do
 			local info = debug.getinfo(frame, "Sl")
 			if not info then
