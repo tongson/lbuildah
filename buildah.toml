@@ -38,6 +38,9 @@ required = true
 [[DOWNLOAD.args]]
 type = "..."
 required = true
+[[RR.args]]
+type = "..."
+required = true
 [[MKDIR.args]]
 type = "..."
 required = true
