@@ -972,6 +972,7 @@ ENV.COPY = function(src, dest, og, mo)
 	}
 	B()
 end
+ENV.UPLOAD = ENV.COPY
 ENV.MKDIR = function(d, mode)
 	local mkdir = exec.ctx("mkdir")
 	mkdir.cwd = Mount()
