@@ -885,7 +885,7 @@ ENV.RR = function(dir, a)
 	}
 	B.log = {
 		directory = dir,
-		args = a,
+		arguments = a,
 	}
 	B()
 end
