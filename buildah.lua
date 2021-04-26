@@ -789,7 +789,7 @@ ENV.NOTIFY = Setmetatable({}, {
 					AuthorSubname = tbl.message,
 					AuthorLink = "https://github.com/tongson/buildah.lua",
 					AuthorIcon = "https://avatars2.githubusercontent.com/u/652790",
-					Text = "```"..payload.."```",
+					Text = "```" .. payload .. "```",
 					Footer = "buildah.lua",
 					FooterIcon = "https://platform.slack-edge.com/img/default_application_icon.png",
 				}
@@ -1021,11 +1021,11 @@ end
 ENV.DOWNLOAD = function(src, dest)
 	local cwd = fs.currentdir()
 	local rd
-	if dest:sub(1,1) == "/" then
+	if dest:sub(1, 1) == "/" then
 		rd = dest
 	else
-		rd = cwd.."/"..dest
-  end
+		rd = cwd .. "/" .. dest
+	end
 	local cp = exec.ctx("cp")
 	cp.cwd = Mount()
 	local r, so, se = cp({
