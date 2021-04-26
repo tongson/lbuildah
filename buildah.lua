@@ -627,6 +627,8 @@ local Concat = table.concat
 local Insert = table.insert
 local Unpack = unpack
 local Gmatch = string.gmatch
+local Setmetatable = setmetatable
+local Next = next
 local Logger = require("logger")
 local Ok = function(msg, tbl)
 	local stdout = Logger.new("stdout")
@@ -654,7 +656,7 @@ local buildah = exec.ctx("buildah")
 buildah.env = { USER = os.getenv("USER"), HOME = os.getenv("HOME") }
 local Buildah = function(msg)
 	local set = {}
-	return setmetatable(set, {
+	return Setmetatable(set, {
 		__call = function(_, a)
 			a = a or ""
 			set.log = set.log or {}
@@ -664,7 +666,7 @@ local Buildah = function(msg)
 				c[#c + 1] = k
 				t[#t + 1] = k
 			end
-			set.log.args = Concat(t, " ")
+			set.log.args = Next(t) and Concat(t, " ")
 			local r, so, se, err = buildah(c)
 			if not r then
 				set.log.stdout = so
@@ -687,7 +689,7 @@ local Buildah = function(msg)
 	})
 end
 local ENV = {}
-setmetatable(ENV, {
+Setmetatable(ENV, {
 	__index = function(_, value)
 		return rawget(_G, value) or Panic("Unknown command or variable", { string = value })
 	end,
@@ -756,7 +758,7 @@ local Epilogue = function()
 	Unmount()
 end
 local Json = require("json")
-ENV.NOTIFY = setmetatable({}, {
+ENV.NOTIFY = Setmetatable({}, {
 	__newindex = function(_, k, v)
 		local key = k:upper()
 		Notify_Toggle[key] = v
@@ -799,7 +801,7 @@ ENV.NOTIFY = setmetatable({}, {
 })
 ENV.FROM = function(base, cid, assets)
 	Assets = assets or fs.currentdir()
-	Name = cid or require("uid").new()
+	Name = cid or require("ksuid").new()
 	base = base or "scratch"
 	if not cid then
 		local B = Buildah("FROM")
@@ -1046,7 +1048,7 @@ ENV.RM = function(f)
 	end
 	Unmount()
 end
-ENV.CONFIG = setmetatable({}, {
+ENV.CONFIG = Setmetatable({}, {
 	__newindex = function(_, k, v)
 		k = k:lower()
 		local B = Buildah("CONFIG")
