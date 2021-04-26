@@ -32,6 +32,12 @@ required = true
 [[COPY.args]]
 type = "..."
 required = true
+[[UPLOAD.args]]
+type = "..."
+required = true
+[[DOWNLOAD.args]]
+type = "..."
+required = true
 [[MKDIR.args]]
 type = "..."
 required = true
