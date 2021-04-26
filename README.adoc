@@ -208,6 +208,7 @@ Send start and end instruction notification.
 |Key |Description |Example
 |TELEGRAM|Send to Telegram channel, requires TELEGRAM_TOKEN environment variable| string: "-123123123"
 |PUSHOVER|Send to Pushover registered device, requires PUSHOVER_TOKEN environment variable| string: "a09mfg9349vmv"
+|SLACK|Send message to Slack webhook, requires the SLACK_WEBHOOK environment variable| string: "T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"
 |===
 
 === Example
