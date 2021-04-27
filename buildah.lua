@@ -820,11 +820,23 @@ ENV.NOTIFY = Setmetatable({}, {
 		end
 	end,
 })
-ENV.FROM = function(base, cid, assets)
+ENV.FROM = function(base, cname, assets)
+	Name = cname or require("ksuid").new()
+	local found = function()
+		local _, so, _ = buildah({
+			"containers",
+			"--json",
+		})
+		local j = Json.decode(so)
+		for _, v in ipairs(j) do
+			if v.containername == Name then
+				return true
+			end
+		end
+	end
 	Assets = assets or fs.currentdir()
-	Name = cid or require("ksuid").new()
 	base = base or "scratch"
-	if not cid then
+	if not found() then
 		local B = Buildah("FROM")
 		B.cmd = {
 			"from",
