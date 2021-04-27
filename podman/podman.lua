@@ -148,6 +148,7 @@ setmetatable(M, {
 			URL = "Image URL.",
 			TAG = "Image tag.",
 			CPUS = "Argument to podman --cpuset-cpus.",
+			ARGS = "Arguments to any function hooks.",
 			always_update = "Boolean flag, if `true` always pull the image.",
 		}
 		M.param = {}
@@ -164,6 +165,9 @@ setmetatable(M, {
 
 		local systemd = require("systemd." .. M.param.NAME)
 		M.reg.unit = systemd.unit
+		if systemd.func and M.param.ARGS then
+			systemd.func(M.param.ARGS)
+		end
 		if next(systemd.volumes) then
 			volume(systemd.volumes)
 			for vn in pairs(systemd.volumes) do
