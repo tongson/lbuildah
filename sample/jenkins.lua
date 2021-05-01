@@ -1,4 +1,3 @@
-require("buildah")
 FROM("docker://docker.io/adoptopenjdk/openjdk11:jdk-11.0.10_9-debianslim-slim")
 APT_GET("update")
 APT_GET("upgrade")
