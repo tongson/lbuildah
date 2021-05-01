@@ -1,4 +1,3 @@
-require("buildah")
 FROM("gcr.io/distroless/static", "coredns")
 UPLOAD("coredns.v1.8.3", "/coredns")
 ENTRYPOINT("/coredns", "-conf", "/config/Corefile")
