@@ -1,4 +1,4 @@
-std = "buildah"
+std = "lbuildah"
 
 [rules]
 unscoped_variables = "allow"
