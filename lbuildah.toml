@@ -63,7 +63,7 @@ required = true
 type = "string"
 required = true
 [[PUSH.args]]
-type = "string"
+type = "..."
 required = true
 [[DIR.args]]
 type = "string"
