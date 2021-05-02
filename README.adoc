@@ -1,4 +1,4 @@
-= buildah
+= lbuildah
 :toc:
 :toc-placement!:
 
