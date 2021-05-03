@@ -711,9 +711,13 @@ local Buildah = function(msg)
 	})
 end
 local ENV = {}
+local LOCAL = {}
 Setmetatable(ENV, {
+	__newindex = function(_, k, v)
+		return rawset(LOCAL, k, v)
+	end,
 	__index = function(_, value)
-		return rawget(_G, value) or Panic("Unknown command or variable", { string = value })
+		return rawget(LOCAL, value) or rawget(_G, value) or Panic("Unknown command or variable", { string = value })
 	end,
 })
 local Name, Assets
