@@ -625,7 +625,6 @@ local Notify = function()
 end
 local Concat = table.concat
 local Insert = table.insert
-local Unpack = unpack
 local Util = require("util")
 local Gmatch = string.gmatch
 local Setmetatable = setmetatable
