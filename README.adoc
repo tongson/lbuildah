@@ -15,6 +15,11 @@ Check the `sample` directory in the https://github.com/tongson/buildah.lua[repo]
 .*DSL*
 Besides the documented commands below, this DSL module also has a string interpolation extension.
 
+.*Runtime requirements*
+* buildah
+* coreutils
+* rsync
+
 .Example:
 ----
 JENKINS_HOME = "/var/jenkins_home"
