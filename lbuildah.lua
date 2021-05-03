@@ -632,7 +632,7 @@ local Next = next
 local Logger = require("logger")
 local Ok = function(msg, tbl)
 	local stdout = Logger.new("stdout")
-	tbl._ident = "buildah.lua"
+	tbl._ident = "lbuildah"
 	stdout:info(msg, tbl)
 end
 local Panic = function(msg, tbl)
@@ -791,7 +791,7 @@ ENV.NOTIFY = Setmetatable({}, {
 		Notify = function(msg, tbl)
 			tbl.message = msg
 			tbl.time = Logger.time()
-			tbl._ident = "buildah.lua"
+			tbl._ident = "lbuildah"
 			local payload = Json.encode(tbl)
 			if Notify_Toggle.TELEGRAM then
 				local telegram = require("telegram")
@@ -812,10 +812,10 @@ ENV.NOTIFY = Setmetatable({}, {
 					Color = "#2eb886",
 					AuthorName = tbl.name,
 					AuthorSubname = tbl.message,
-					AuthorLink = "https://github.com/tongson/buildah.lua",
+					AuthorLink = "https://github.com/tongson/lbuildah",
 					AuthorIcon = "https://avatars2.githubusercontent.com/u/652790",
 					Text = "```" .. payload .. "```",
-					Footer = "buildah.lua",
+					Footer = "lbuildah",
 					FooterIcon = "https://platform.slack-edge.com/img/default_application_icon.png",
 				}
 				local send = Util.retry_f(slack.attachment)
