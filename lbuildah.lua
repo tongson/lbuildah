@@ -1,4 +1,4 @@
--- Requires buildah, crun
+-- Requires buildah, crun, coreutils, rsync
 local stdin_userland = [[
 bin/domainname
 bin/findmnt
@@ -1051,7 +1051,7 @@ ENV.COPY = function(src, dest, og, mo)
 	if src:sub(1, 1) ~= "/" then
 		src = Assets .. "/" .. src
 	end
-	local B = Buildah("COPY/UPLOAD")
+	local B = Buildah("COPY")
 	B.cmd = {
 		"copy",
 		Name,
@@ -1072,7 +1072,49 @@ ENV.COPY = function(src, dest, og, mo)
 	}
 	B()
 end
-ENV.UPLOAD = ENV.COPY
+ENV.UPLOAD = function(src, dest)
+	if not Name then
+		Ok("UPLOAD", { skip = true, name = false })
+		return
+	end
+	local cwd = fs.currentdir()
+	src = cwd .. "/" .. src
+	local rd
+	if dest:sub(1, 1) == "/" then
+		rd = "." .. dest
+	end
+	local rsync = exec.ctx("rsync")
+	rsync.cwd = Mount()
+	local t = {
+		"--recursive",
+		"--links",
+		"--perms",
+		"--no-o",
+		"--no-g",
+		src,
+		rd,
+	}
+	local ignore = cwd .. "/.dockerignore"
+	if fs.isfile(ignore) then
+		Insert(t, 1, ignore)
+		Insert(t, 1, "--exclude-from")
+	end
+	local r, so, se = rsync(t)
+	Unmount()
+	if r then
+		Ok("UPLOAD", {
+			source = src,
+			destination = dest,
+		})
+	else
+		Panic("UPLOAD", {
+			source = src,
+			destination = dest,
+			stdout = so,
+			stderr = se,
+		})
+	end
+end
 ENV.MKDIR = function(d, mode)
 	if not Name then
 		Ok("MKDIR", { skip = true, name = false })
