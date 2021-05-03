@@ -1144,7 +1144,6 @@ ENV.DOWNLOAD = function(src, dest)
 	local r, so, se = cp({
 		"-R",
 		"-P",
-		"-n",
 		Trim(src),
 		rd,
 	})
