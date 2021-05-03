@@ -129,7 +129,6 @@ Run APK command inside an Alpine Linux container.
 |===
 
 == *COPY* (_SOURCE_, _DESTINATION_[, _CHOWN_][, _CHMOD_])
-Alias: *UPLOAD* +
 
 Copy file to a destination path within the container.
 
@@ -141,6 +140,18 @@ Copy file to a destination path within the container.
 |No |string |Path | Copies _SOURCE_ to the container's root(/) directory |/etc/sysctl.conf
 |No  |string |chown string, user and group ownership of destination ||ed:ed
 |No  |string |chmod string, access permissions of destination | |0644
+|===
+
+== *UPLOAD* (_SOURCE_, _DESTINATION_)
+
+Copy file to a destination path within the container. Difference with `COPY` is that this can read `.dockerignore`.
+
+=== Arguments
+[options="header"]
+|===
+|Required |Type |Description |Default |Example
+|Yes |string |File, without a leading (/) it attempts to copy from the *ASSETS* directory set in `FROM()` | |sysctl.conf
+|Yes|string |Path | |/etc/sysctl.conf
 |===
 
 == *DOWNLOAD* (_SOURCE_[, _DESTINATION_])
