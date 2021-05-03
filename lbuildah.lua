@@ -831,12 +831,17 @@ ENV.FROM = function(base, cname, assets)
 			"containers",
 			"--json",
 		})
-		local j = Json.decode(so)
-		for _, v in ipairs(j) do
-			if v.containername == Name then
-				return true
+		if so:len() > 0 then
+			local j = Json.decode(so)
+			if j and next(j) then
+				for _, v in ipairs(j) do
+					if v.containername == Name then
+						return true
+					end
+				end
 			end
 		end
+		return false
 	end
 	Assets = assets or fs.currentdir()
 	base = base or "scratch"
