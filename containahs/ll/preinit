@@ -1,0 +1,7 @@
+#!/bin/sh
+set -efu
+chmod 0755 / /usr/bin /bin
+chown 0:0 /
+git clone https://github.com/tongson/LadyLua /LadyLua
+cd /LadyLua
+rr scripts:build
