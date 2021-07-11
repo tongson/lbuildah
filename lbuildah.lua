@@ -1069,7 +1069,6 @@ _G["UPLOAD"] = function(src, dest)
 	end
 	local cwd = fs.currentdir()
 	src = cwd .. "/" .. src
-	dest = dest or "/" .. src
 	local rd
 	if dest:sub(1, 1) == "/" then
 		rd = "." .. dest
