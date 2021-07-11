@@ -18,7 +18,7 @@ required = true
 type = "string"
 required = true
 [[APT_GET.args]]
-type = "string"
+type = "any"
 required = true
 [[APT_PURGE.args]]
 type = "string"
@@ -60,7 +60,7 @@ required = true
 type = "string"
 required = true
 [[COMMIT.args]]
-type = "string"
+type = "any"
 required = true
 [[PUSH.args]]
 type = "..."
