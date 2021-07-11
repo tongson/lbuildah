@@ -1,0 +1,44 @@
+[Unit]
+Description=ZeroTier One
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Restart=always
+#SystemCallArchitectures=native
+#MemoryDenyWriteExecute=yes
+Type=notify
+NotifyAccess=all
+KillMode=mixed
+LockPersonality=yes
+NoNewPrivileges=yes
+RemoveIPC=yes
+#DevicePolicy=closed
+PrivateTmp=yes
+PrivateNetwork=false
+#PrivateDevices=yes
+ProtectKernelModules=yes
+ProtectSystem=full
+ProtectHome=yes
+#ProtectKernelTunables=yes
+ProtectKernelLogs=yes
+ProtectClock=yes
+RestrictRealtime=yes
+#RestrictSUIDSGID=yes
+RestrictAddressFamilies=AF_INET AF_UNIX AF_NETLINK
+RestartSec=5
+ExecStartPre=-/usr/bin/podman stop -i zerotier-one
+ExecStartPre=-/usr/bin/podman rm -i -v -f zerotier-one
+ExecStop=/usr/bin/podman stop -t 120 zerotier-one
+ExecStopPost=-/usr/bin/podman rm -i -v -f zerotier-one
+ExecStart=/usr/bin/podman run --rm \
+--replace \
+--sdnotify conmon \
+--name zerotier-one --hostname zerotier-one --network host \
+--device /dev/net/tun \
+--cap-add net_raw \
+--cap-add net_admin \
+-e MALLOC_ARENA_MAX=1 \
+-v /srv/podman/zerotier-one:/var/lib/zerotier-one \
+6598a0c33c06
