@@ -1,4 +1,5 @@
 -- Requires buildah, crun, coreutils, rsync
+extend("string")
 local stdin_userland = [[
 bin/domainname
 bin/findmnt
