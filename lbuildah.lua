@@ -1011,10 +1011,9 @@ _G["APT_PURGE"] = function(p)
 		"--force-remove-essential",
 		"--force-breaks",
 		"--force-unsafe-io",
-		p,
 	}
 	B.log = { package = p }
-	B()
+	B(p)
 end
 _G["APK"] = function(v)
 	if not Name then
