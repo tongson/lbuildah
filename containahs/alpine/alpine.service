@@ -1,0 +1,39 @@
+[Unit]
+Description=Alpine
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Restart=always
+SystemCallArchitectures=native
+#MemoryDenyWriteExecute=yes
+Type=notify
+NotifyAccess=all
+KillMode=mixed
+LockPersonality=yes
+NoNewPrivileges=yes
+RemoveIPC=yes
+DevicePolicy=closed
+PrivateTmp=yes
+PrivateNetwork=false
+PrivateDevices=yes
+ProtectKernelModules=yes
+ProtectSystem=full
+ProtectHome=yes
+#ProtectKernelTunables=yes
+ProtectKernelLogs=yes
+ProtectClock=yes
+RestrictRealtime=yes
+#RestrictSUIDSGID=yes
+#RestrictAddressFamilies=AF_INET AF_UNIX AF_NETLINK
+RestartSec=5
+ExecStartPre=-/usr/bin/podman stop -i alpine
+ExecStartPre=-/usr/bin/podman rm -i -v -f alpine
+ExecStop=/usr/bin/podman stop -t 120 alpine
+ExecStopPost=-/usr/bin/podman rm -i -v -f alpine
+ExecStart=/usr/bin/podman run --rm \
+--replace \
+--sdnotify conmon \
+--name alpine --hostname alpine --network host \
+--rootfs /srv/alpine /init -main '/esshd 127.0.0.1:23 /usr/bin/fish'

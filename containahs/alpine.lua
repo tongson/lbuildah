@@ -1,0 +1,5 @@
+FROM("docker://docker.io/library/alpine:edge", "alpine", "alpine")
+RUN("/sbin/apk upgrade --available --no-cache")
+COPY("esshd")
+COPY("init")
+TAR("alpine.tar")
