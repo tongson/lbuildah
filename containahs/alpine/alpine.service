@@ -6,7 +6,7 @@ WantedBy=multi-user.target
 
 [Service]
 Restart=always
-SystemCallArchitectures=native
+#SystemCallArchitectures=native
 #MemoryDenyWriteExecute=yes
 Type=notify
 NotifyAccess=all
