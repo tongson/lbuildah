@@ -1,5 +1,6 @@
 FROM("docker://docker.io/library/alpine:edge", "alpine", "alpine")
 RUN("/sbin/apk upgrade --available --no-cache")
-COPY("esshd")
+RUN("/sbin/apk add openssh-server")
+RUN("/usr/bin/ssh-keygen -A")
 COPY("init")
 TAR("alpine.tar")

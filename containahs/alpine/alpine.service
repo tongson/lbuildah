@@ -36,4 +36,4 @@ ExecStart=/usr/bin/podman run --rm \
 --replace \
 --sdnotify conmon \
 --name alpine --hostname alpine --network host \
---rootfs /srv/alpine /init -main '/esshd 127.0.0.1:23 /usr/bin/fish'
+--rootfs /srv/alpine /init -main '/usr/sbin/sshd -D'
