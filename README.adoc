@@ -15,27 +15,22 @@ Check the `sample` directory in the https://github.com/tongson/buildah.lua[repo]
 .*DSL*
 Besides the documented commands below, this DSL module also has a string interpolation extension.
 
-.*Runtime requirements*
-* buildah
-* coreutils
-* rsync
-
 .Example:
 ----
 JENKINS_HOME = "/var/jenkins_home"
 CONFIG.ENV = "JENKINS_HOME=%s" % JENKINS_HOME
 ----
 
-:note-caption: :information_source:
-[NOTE]
-====
-All instructions will signal an exit on error.
-====
+.*Runtime requirements*
+* buildah
+* coreutils
+* rsync
+* crun
 
 :note-caption: :information_source:
 [NOTE]
 ====
-Requires buildah(1) and crun(1).
+All instructions will signal an exit on error.
 ====
 
 :note-caption: :information_source:
